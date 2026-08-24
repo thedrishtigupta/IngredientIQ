@@ -14,15 +14,15 @@ The planned system is:
 ```text
 DATA
   ↓
-Data Profiling
+Data Profiling ✅
   ↓
-Ingredient Parser
+Ingredient Parser ✅
   ↓
-Ingredient Knowledge Layer
+Ingredient Knowledge Layer ✅
   ↓
-Product + Ingredient Database
+Product + Ingredient Database ✅
   ↓
-Basic Recommendation Engine
+Basic Recommendation Engine ✅
   ↓
 Explainable Ranking
   ↓
@@ -159,6 +159,48 @@ Orphan reviews                       0
 The database has been validated using product/ingredient, ingredient/knowledge,
 product/review, and review-summary relationships.
 
+### Phase 5 — Basic Recommendation Engine
+
+The first deterministic recommendation engine has been implemented.
+
+It currently supports:
+
+- User goal matching
+- Product intent / subcategory matching
+- Category filtering
+- Subcategory filtering
+- Budget constraints
+- Ingredient-based matching
+- Rating signals
+- Popularity signals
+- Weighted product ranking
+- Top-K recommendations
+
+Current scoring structure:
+
+```text
+Goal Match       55%
+Product Intent   25%
+Rating           15%
+Popularity        5%
+```
+Product intent is configured per user goal to prioritize appropriate
+product types. For example:
+
+- Hydration → Moisturizers
+- Brightening → Treatments / Moisturizers / Masks
+- Exfoliation → Treatments / Cleansers / Masks
+- Hair Conditioning → Shampoo & Conditioner / Hair Treatments
+
+The engine is deterministic: the same structured requirements and database
+state produce the same ranking.
+
+Recommendation tests have been run across multiple goals including:
+
+- Hydration
+- Brightening
+- Exfoliation
+- Hair conditioning
 ---
 
 # Project Structure
@@ -178,9 +220,11 @@ IngredientIQ/
 │   └── ingredient_parser_fixtures.json
 │
 ├── scripts/
+│   ├── __init__.py
 │   ├── load_database.py
 │   ├── run_ingredient_parser.py
 │   ├── run_review_pipeline.py
+│   ├── test_recommender.py
 │   └── update_review_quality_report.py
 │
 ├── sql/
@@ -191,17 +235,26 @@ IngredientIQ/
 ├── src/
 │   ├── __init__.py
 │   └── ingredients/
+│   |   ├── __init__.py
+│   |   ├── models.py
+│   |   ├── normalizer.py
+│   |   ├── parser.py
+│   |   ├── pipeline.py
+│   |   └── quality.py
+|   │
+│   └── recommender/
 │       ├── __init__.py
 │       ├── models.py
-│       ├── normalizer.py
-│       ├── parser.py
-│       ├── pipeline.py
-│       └── quality.py
+│       ├── repository.py
+│       ├── filters.py
+│       ├── scorer.py
+│       └── engine.py
 │
 └── tests/
     ├── test_ingredient_parser.py
     ├── test_parser_real_edge_cases.py
     ├── test_review_pipeline_contract.py
+    ├── test_recommender.py
     └── fixtures/
         └── ingredient_parser_fixtures.json
 ```
@@ -634,15 +687,23 @@ python scripts/run_review_pipeline.py
 
 ## Tests
 
+Run all tests:
+
 ```powershell
-pytest
+python -m pytest -v
 ```
-
-The parser tests and review pipeline contract tests are located under:
-
-```text
-tests/
+Recommendation tests:
 ```
+python -m pytest tests/test_recommender.py -v
+```
+The test suite currently covers:
+
+- Ingredient parser behavior
+- Parser edge cases
+- Review pipeline contract
+- Recommendation scoring
+- Product intent scoring
+- Recommendation request default
 
 ---
 
@@ -715,31 +776,35 @@ data pipelines.
 
 # Next Development Phase
 
-The data foundation is complete.
+The data foundation and Basic Recommendation Engine are complete.
 
 The next major phase is:
 
 ```text
-Basic Recommendation Engine
+Explainable Ranking
 ```
 
-The recommendation engine will eventually use:
+The explanation layer will expose why a product was recommended using
+evidence already present in the database.
 
-- User requirements
-- Product category
-- Budget
-- Ingredient matching
-- Ingredient functional properties
-- Product similarity
-- Ratings
+Planned explanation signals include:
+
+- Goal match
+- Product intent match
+- Matched ingredients
+- Rating
 - Popularity
-- Review-derived signals
+- Budget compatibility
+- Relevant functional properties
 
-The planned architecture keeps product selection deterministic.
+The explanation system should be backed by actual database evidence rather
+than generated independently by an LLM.
 
-Later, an LLM can be used for:
+Later phases will add:
 
-1. Converting natural-language user requirements into structured requirements.
-2. Turning computed recommendation evidence into natural-language explanations.
-
-The LLM should not independently decide which products are recommended.
+1. Review Intelligence
+2. Hybrid Recommendation Engine
+3. Natural Language / LLM Interface
+4. Frontend Integration
+5. Recommendation Evaluation
+6. Deployment
