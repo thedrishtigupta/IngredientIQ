@@ -1,6 +1,5 @@
 from src.recommender import RecommendationEngine, RecommendationRequest
 
-
 def main():
     request = RecommendationRequest(
         category="Skincare",
@@ -29,9 +28,18 @@ def main():
             print(f"   Popularity score: {result.popularity_score:.4f}")
             print(f"   Matched goals: {result.matched_goals}")
             print(
-                f"   Matched ingredients: "
-                f"{result.matched_ingredients[:10]}"
+                f"   Matched ingredients ({len(result.matched_ingredients)}): "
+                f"{result.matched_ingredients}"
             )
+            if result.explanation:
+                print("   Strengths:")
+                for reason in result.explanation.strengths:
+                    print(f"   ✓ {reason}")
+
+                if result.explanation.weaknesses:
+                    print("   Weaknesses:")
+                    for reason in result.explanation.weaknesses:
+                        print(f"   ! {reason}")
             print()
 
     finally:

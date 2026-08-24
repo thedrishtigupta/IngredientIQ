@@ -2,7 +2,7 @@ from .filters import filter_products
 from .models import RecommendationRequest, RecommendationResult
 from .repository import ProductRepository
 from .scorer import calculate_score
-
+from .explanations import build_explanation
 
 class RecommendationEngine:
     def __init__(self, repository=None):
@@ -104,5 +104,8 @@ class RecommendationEngine:
             key=lambda result: result.score,
             reverse=True,
         )
+        
+        for result in results:
+            result.explanation = build_explanation(result)
 
         return results[:request.top_k]

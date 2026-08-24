@@ -15,6 +15,12 @@ class RecommendationRequest:
 
     top_k: int = 10
 
+@dataclass
+class RecommendationExplanation:
+    strengths: list[str] = field(default_factory=list)
+    weaknesses: list[str] = field(default_factory=list)
+    matched_goals: list[str] = field(default_factory=list)
+    matched_ingredients: list[str] = field(default_factory=list)
 
 @dataclass
 class RecommendationResult:
@@ -37,3 +43,29 @@ class RecommendationResult:
 
     matched_goals: list[str] = field(default_factory=list)
     matched_ingredients: list[str] = field(default_factory=list)
+    
+    explanation: RecommendationExplanation | None = None
+    
+    def to_dict(self) -> dict:
+        return {
+            "product_id": self.product_id,
+            "product_name": self.product_name,
+            "brand": self.brand,
+            "category": self.category,
+            "subcategory": self.subcategory,
+            "price": self.price,
+            "rating": self.rating,
+            "review_count": self.review_count,
+            "loves_count": self.loves_count,
+            "score": self.score,
+            "matched_goals": list(self.matched_goals),
+            "matched_ingredients": list(self.matched_ingredients),
+            "explanation": (
+                {
+                    "strengths": list(self.explanation.strengths),
+                    "weaknesses": list(self.explanation.weaknesses),
+                }
+                if self.explanation
+                else None
+            ),
+        }
