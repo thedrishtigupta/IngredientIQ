@@ -1,0 +1,39 @@
+from dataclasses import dataclass, field
+from typing import Optional
+
+
+@dataclass
+class RecommendationRequest:
+    category: Optional[str] = None
+    subcategory: Optional[str] = None
+    min_price: Optional[float] = None
+    max_price: Optional[float] = None
+
+    goals: list[str] = field(default_factory=list)
+    required_ingredients: list[str] = field(default_factory=list)
+    excluded_ingredients: list[str] = field(default_factory=list)
+
+    top_k: int = 10
+
+
+@dataclass
+class RecommendationResult:
+    product_id: str
+    product_name: str
+    brand: Optional[str]
+    category: Optional[str]
+    subcategory: Optional[str]
+
+    price: Optional[float]
+    rating: Optional[float]
+    review_count: Optional[int]
+    loves_count: Optional[int]
+
+    score: float
+    goal_match_score: float
+    intent_score: float
+    rating_score: float
+    popularity_score: float
+
+    matched_goals: list[str] = field(default_factory=list)
+    matched_ingredients: list[str] = field(default_factory=list)
