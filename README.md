@@ -37,8 +37,10 @@ Frontend
 Evaluation
 ```
 
-The current work is focused on building a reliable data and database foundation
-before implementing the recommendation engine.
+The data and database foundation is complete, and the first deterministic
+recommendation engine has been implemented and tested.
+
+The current work is moving toward explainable recommendation results.
 
 ---
 
