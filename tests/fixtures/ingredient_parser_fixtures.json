@@ -1,0 +1,94 @@
+[
+  {
+    "test": "normal",
+    "product_id": "P473668",
+    "product_name": "La Habana Eau de Parfum",
+    "raw_ingredients": [
+      "Alcohol Denat. (SD Alcohol 39C), Parfum (Fragrance) Ethylhexyl Methoxycinnamate, Ethylhexyl Salicylate, Butyl Methoxydibenzoylmethane, Benzyl Alcohol, Benzyl Benzoate, Benzyl Cinnamate, Cinnamal, Citral, Coumarin Limonene, Eugenol, Alpha-Isomethyl Ionone, Linalool."
+    ]
+  },
+  {
+    "test": "parentheses_ci",
+    "product_id": "P421277",
+    "product_name": "GENIUS Liquid Collagen Serum",
+    "raw_ingredients": [
+      "Collagen (Vegan)*, Water (Aqua, Eau), Propanediol, Isononyl Isononanoate, Butylene Glycol, Glycerin, Betaine, Pentylene Glycol, Dextrin Palmitate, Collagen Amino Acids (Vegan)*, Parachlorella Beijerinckii Exopolysaccharides, Chlorella Protothecoides Oil, Helichrysum Stoechas Flower Extract, Cylindrotheca Fusiformis Extract, Niacinamide, Tocopherol, Palmitoyl Tripeptide-1, Palmitoyl Tetrapeptide-7, Adenosine, Helianthus Annuus (Sunflower) Seed Oil, Leuconostoc/Radish Root Ferment Filtrate, Caprylic/Capric Triglyceride, Palmitic Acid, Disodium EDTA, Carbomer, Sodium Lactate, Amodimethicone, Homosalate, Polysorbate 20, Butyl Methoxydibenzoylmethane, 1,2-Hexanediol, Caprylyl Glycol, Octocrylene, Sodium Hydroxide, Phenoxyethanol, Fragrance (Parfum), Limonene, Beta-Carotene (CI 40800)."
+    ]
+  },
+  {
+    "test": "may_contain",
+    "product_id": "P503754",
+    "product_name": "Skin-Enhancing Tinted Moisturizer",
+    "raw_ingredients": [
+      "Water/Aqua/Eau, Isohexadecane, Dimethicone, Isopropyl Isostearate, Isopropyl Myristate, C18-36 Acid Triglyceride, Glycerin, Propanediol, Cucurbita Pepo Seed Extract, Magnesium Sulfate, PEG-30 Dipolyhydroxystearate, Dimethicone Crosspolymer, Adansonia Digitata Fruit Extract, Hibiscus Sabdariffa Flower Extract, Hydrogenated Lecithin, Phyllanthus Emblica Fruit Extract, Tocopherol, Maltodextrin, Ethylhexylglycerin, Sodium Benzoate, Sodium Chloride, Phenoxyethanol. May Contain: Titanium Dioxide (CI 77891), Iron Oxides (CI 77491, CI 77492, CI 77499)."
+    ]
+  },
+  {
+    "test": "semicolon",
+    "product_id": "P398965",
+    "product_name": "Rose Lip Conditioner",
+    "raw_ingredients": [
+      "Polybutene; Hydrogenated Polyisobutene; Dextrin Palmitate; Bis-Diglyceryl Polyacyladipate-2; Polydecene; Magnolia Officinalis Bark Extract; Limnanthes Alba (Meadowfoam) Seed Oil; Lecithin; Caprylyl Glycol; Simethicone; Pentaerythrityl Tetra-Di-T-Butyl Hydroxyhydrocinnamate; Hexylene Glycol; Fragrance (Parfum); Phenoxyethanol; [+/- Titanium Dioxide (Ci 77891); Iron Oxides (Ci 77491, Ci 77492, Ci 77499); Red 7 Lake (Ci 15850); Blue 1 Lake (Ci 42090); Manganese Violet (Ci 77742); Yellow 5 Lake (Ci 19140); Red 22 Lake (Ci 45380); Red 30 Lake (Ci 73360); Mica; Red 6 (Ci 15850); Yellow 6 Lake (Ci 15985); Carmine (Ci 75470); Bismuth Oxychloride (Ci 77163); Red 33 Lake (Ci 17200); Orange 5 (Ci 45370); Red 28 Lake (Ci 45410)]."
+    ]
+  },
+  {
+    "test": "continuation",
+    "product_id": "P473661",
+    "product_name": "Kasbah Eau de Parfum Travel Spray",
+    "raw_ingredients": [
+      "Alcohol Denat. (SD Alcohol 39C), Parfum (Fragrance) Coumarin, Ethylhexyl Methoxycinnamate,",
+      "Butyl Methoxydibenzoylmethane, Ethylhexyl Salicylate, D-Limonene, Eugenol, Linalool, Citronellol, Geraniol, Cinnamal, Citral."
+    ]
+  },
+  {
+    "test": "component",
+    "product_id": "P503731",
+    "product_name": "The Customizable Crew Set: Highlighter, Lip Oil, and Skin Tint Set",
+    "raw_ingredients": [
+      "Skin-Enhancing Tint:",
+      "Water/Aqua/Eau, Isohexadecane, Dimethicone, Isopropyl Isostearate, Isopropyl Myristate, C18-36 Acid Triglyceride, Glycerin, Propanediol, Cucurbita Pepo Seed Extract, Magnesium Sulfate, Peg-30 Dipolyhydroxystearate, Dimethicone Crosspolymer, Adansonia Digitata Fruit Extract, Hibiscus Sabdariffa Flower Extract, Hydrogenated Lecithin,Phyllanthus Emblica Fruit Extract, Tocopherol, Maltodextrin, Ethylhexylglycerin, Sodium Benzoate, Sodium Chloride, Phenoxyethanol. May Contain: Titanium Dioxide (Ci 77891), Iron Oxides (Ci 77491, Ci 77492, Ci 77499).",
+      "Light-Catching Highlighter:",
+      "Diisostearyl Malate, Octyldodecanol, Octyldodecyl Neopentanoate, Polybutene, Tridecyl Trimellitate, Hydrogenated Polyisobutene, Dibutyl Lauroyl Glutamide, Dibutyl Ethylhexanoyl Glutamide, Silica Dimethyl Silylate, Adansonia Digitata Seed Oil, Calcium Sodium Borosilicate, Pentaerythrityl Tetra-Di-T-Butyl Hydroxyhydrocinnamate, Tin Oxide, Tocopherol, Titanium Dioxide (Ci 77891).",
+      "Lip Treatment Oil:",
+      "Triisostearoyl Polyglyceryl-3 Dimer Dilinoleate, Polybutene, Diisostearyl Malate, Octyldodecanol, Polyglyceryl-2 Triisostearate, Vp/Hexadecene Copolymer, Silica Dimethyl Silylate, Adansonia Digitata Seed Oil, Camellia Japonica Seed Oil, Passiflora Incarnata Seed Oil, Pentaclethra Macroloba Seed Oil, Tocopherol, Hexadecene, Pentaerythrityl Tetra-Di-T-Butyl Hydroxyhydrocinnamate, Flavor (Aroma). May Contain: Titanium Dioxide (Ci 77891), Iron Oxides (Ci 77491, Ci 77492), Blue I Lake (Ci 42090), Red 7 Lake (Ci 15850), Ci 45380 (Red 22 Lake), Ci 45410 (Red 28 Lake)."
+    ]
+  },
+  {
+    "test": "steps",
+    "product_id": "P269122",
+    "product_name": "Alpha Beta Extra Strength Daily Peel Pads",
+    "raw_ingredients": [
+      "Step 1:",
+      "Water/Aqua/Eau, Alcohol Denat. (SD Alcohol 40-B), Glycolic Acid, Potassium Hydroxide, Hamamelis Virginiana (Witch Hazel) Water, Salicylic Acid*, Polysorbate 20, Lactic Acid, Mandelic Acid, Malic Acid, Citric Acid, Salix Alba (Willow) Bark Extract, Camellia Sinensis Leaf Extract, Achillea Millefolium Extract, Chamomilla Recutita (Matricaria) Flower Extract, Soy Isoflavones, Anthemis Nobilis Flower Extract, Glycerin, Copper PCA, Zinc PCA, Lecithin, Alcohol, Polysorbate 80, Disodium EDTA, Menthone Glycerin Acetal, Fragrance (Parfum), Phenoxyethanol, Benzoic Acid, Sodium Benzoate, Potassium Sorbate (* - exfoliant)",
+      "Step 2:",
+      "Water/Aqua/Eau, Sodium Bicarbonate, Resveratrol, Retinol, Ascorbic Acid, Ubiquinone, Phospholipids, Adenosine, Tocopheryl Acetate, Soy Isoflavones, Achillea Millefolium Extract, Camellia Sinensis Leaf Extract, Leuconostoc/Radish Root Ferment Filtrate, Copper PCA, Sodium PCA, Zinc PCA, Glycerin, Polysorbate 20, Octoxynol-9, Tetrasodium EDTA, Phenoxyethanol, Sodium Benzoate, Potassium Sorbate."
+    ]
+  },
+  {
+    "test": "shades",
+    "product_id": "P432502",
+    "product_name": "BACKSTAGE Glow Face Palette",
+    "raw_ingredients": [
+      "Shade 1:",
+      "Alumina, Mica, Cetearyl Ethylhexanoate, Hdi/Trimethylol Hexyllactone Crosspolymer, Squalane, Octyldodecyl Stearoyl Stearate, Glycerin, Tin Oxide, Silica, Polysorbate 80, Ethylhexylglycerin, Caprylyl Glycol, 1,2-Hexanediol, Chondrus Crispus Extract, Xanthan Gum, Pentaerythrityl Tetra-Di-T-Butyl Hydroxyhydrocinnamate, Cetearyl Alcohol, Dicalcium Phosphate, Synthetic Fluorphlogopite, Tocopherol. May Contain (+/-):  Ci 15850 (Red 6, Red 7, Red 7 Lake), Ci 15985 (Yellow 6, Yellow 6 Lake), Ci 19140 (Yellow 5, Yellow 5 Lake), Ci 42090 (Blue 1 Lake), Ci 45410 (Red 27, Red 27 Lake, Red 28 Lake), Ci 73360 (Red 30, Red 30 Lake), Ci 75470  (Carmine), Ci 77007 (Ultramarines), Ci 77163 (Bismuth Oxychloride), Ci 77288 (Chromium Oxide Greens), Ci 77289 (Chromium Hydroxide Green), Ci 77491, Ci 77492, Ci 77499 (Iron Oxides), Ci 77510 (Ferric Ferrocyanide, Ferric Ammonium Ferrocyanide), Ci 77742 (Manganese Violet), Ci 77891 (Titanium Dioxide).",
+      "Shade 2:",
+      "Mica, Cetearyl Ethylhexanoate, Hdi/Trimethylol Hexyllactone Crosspolymer, Squalane, Octyldodecyl Stearoyl Stearate, Glycerin, Polysorbate 80, Ethylhexylglycerin, Caprylyl Glycol, 1,2-Hexanediol, Synthetic Fluorphlogopite, Chondrus Crispus Extract, Xanthan Gum, Pentaerythrityl Tetra-Di-T-Butyl Hydroxyhydrocinnamate, Silica, Cetearyl Alcohol, Dicalcium Phosphate, Tocopherol. May Contain (+/-):  Ci 15850 (Red 6, Red 7, Red 7 Lake), Ci 15985 (Yellow 6, Yellow 6 Lake), Ci 19140 (Yellow 5, Yellow 5 Lake), Ci 42090 (Blue 1 Lake), Ci 45410 (Red 27, Red 27 Lake, Red 28 Lake), Ci 73360 (Red 30, Red 30 Lake), Ci 75470  (Carmine), Ci 77007 (Ultramarines), Ci 77163 (Bismuth Oxychloride), Ci 77288 (Chromium Oxide Greens), Ci 77289 (Chromium Hydroxide Green), Ci 77491, Ci 77492, Ci 77499 (Iron Oxides), Ci 77510 (Ferric Ferrocyanide, Ferric Ammonium Ferrocyanide), Ci 77742 (Manganese Violet), Ci 77891 (Titanium Dioxide)."
+    ]
+  },
+  {
+    "test": "percentage",
+    "product_id": "P311143",
+    "product_name": "SUBLIME DEFENSE Ultra Lightweight UV Defense Fluid SPF 50",
+    "raw_ingredients": [
+      "Octinoxate 7.5%, Titanium Dioxide 2%, Zinc Oxide 17.1%, Cyclopentasiloxane, Water (Aqua, Eau), Alcohol Denat., Glycerin, Polyglyceryl-3 Polydimethylsiloxyethyl Dimethicone, Methyl Methacrylate Crosspolymer, PEG/PPG-18/18 Dimethicone, PEG-9 Polydimethylsiloxyethyl Dimethicone, Parachlorella Beijerinckii Exopolysaccharides, Echinacea Purpurea Extract, Tocopheryl Acetate, Camellia Oleifera Leaf Extract, Arctostaphylos Uva Ursi Leaf Extract, Glycyrrhiza Glabra (Licorice) Root Extract, Stearic Acid, Triethoxysilylethyl Polydimethylsiloxyethyl Hexyl Dimethicone, BHT, Ethylhexylglycerin, Caprylyl Glycol, Aluminum Hydroxide, Phenoxyethanol, Hexylene Glycol, Fragrance (Parfum), Hexyl Cinnamal, Linalool."
+    ]
+  },
+  {
+    "test": "asterisk",
+    "product_id": "P476416",
+    "product_name": "AFRICAN Beauty Butter- Intensive Dry Skin Treatment",
+    "raw_ingredients": [
+      "Butyrospermum Parkii (Shea Nilotica) Butter, Butyrospermum Parkii (Shea) Butter, Simmondsia Chinensis (Jojoba) Seed Oil, Adansonia Digitata (Baobab) Oil, Prunus Amygdalus Dulcis (Sweet Almond) Oil, Vitis Vinifera (Grape) Seed Oil, Persea gratissima (Avocado) Oil, Cocos nucifera (Coconut) oil, Vanilla Planifolia (Vanilla) Fruit Extract, Honey, *Tocopherol (mixed), *Beta-Sitosterol, *Squalane."
+    ]
+  }
+]
