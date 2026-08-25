@@ -1,7 +1,9 @@
 import os
 
 import psycopg
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class ProductRepository:
     def __init__(self):
