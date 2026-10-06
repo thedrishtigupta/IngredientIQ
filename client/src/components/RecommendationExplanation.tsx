@@ -1,47 +1,17 @@
-import { groupLabel } from "@/lib/data";
-import type { Requirements, ScoredProduct } from "@/lib/scoring";
-import { ScoreBreakdown } from "./ScoreBreakdown";
+import { Link } from "@tanstack/react-router";
+import type { Recommendation } from "@/lib/api";
+import { humanize } from "@/lib/labels";
+import { IngredientBadge } from "./IngredientBadge";
 import { ReviewInsights } from "./ReviewInsights";
+import { ScoreBreakdown } from "./ScoreBreakdown";
 
-export function EvidenceList({ result, req }: { result: ScoredProduct; req: Requirements }) {
-  const items: { ok: boolean; text: string }[] = [];
-
-  for (const f of req.functions) {
-    items.push({
-      ok: result.matched.includes(f),
-      text: result.matched.includes(f)
-        ? `${groupLabel(f)} ingredients detected`
-        : `No ${groupLabel(f).toLowerCase()} ingredients detected`,
-    });
-  }
-  for (const a of req.avoid) {
-    items.push({
-      ok: result.avoidedHits.length === 0,
-      text:
-        result.avoidedHits.length === 0
-          ? `No ${groupLabel(a).toLowerCase()} ingredients detected`
-          : `Contains ${result.avoidedHits.join(", ")}`,
-    });
-  }
-  if (req.budget) {
-    items.push({
-      ok: result.product.price <= req.budget,
-      text: `$${result.product.price} against a $${req.budget} budget`,
-    });
-  }
-  const review = result.signals.find((s) => s.key === "review");
-  if (review?.value !== null && review) {
-    const top = result.product.reviewAspects?.slice().sort((a, b) => b.positiveShare - a.positiveShare)[0];
-    if (top)
-      items.push({
-        ok: top.positiveShare >= 0.7,
-        text: `${Math.round(top.positiveShare * 100)}% positive review sentiment on ${top.aspect.toLowerCase()}`,
-      });
-  }
-  items.push({
-    ok: result.product.rating >= 4.3,
-    text: `Rated ${result.product.rating.toFixed(1)} of 5 across ${result.product.reviewCount.toLocaleString()} ratings`,
-  });
+/** The API's computed strengths (check) and weaknesses (dash). */
+export function EvidenceList({ result }: { result: Recommendation }) {
+  const items = [
+    ...(result.explanation?.strengths ?? []).map((text) => ({ ok: true, text })),
+    ...(result.explanation?.weaknesses ?? []).map((text) => ({ ok: false, text })),
+  ];
+  if (!items.length) return <p className="text-sm text-muted-foreground">No strengths or weaknesses reported.</p>;
 
   return (
     <ul className="space-y-2.5">
@@ -57,15 +27,32 @@ export function EvidenceList({ result, req }: { result: ScoredProduct; req: Requ
   );
 }
 
+/** Where the summary text came from, so nobody mistakes a template for an LLM answer. */
+export function SummaryNote({ llmUsed }: { llmUsed: boolean }) {
+  return (
+    <p className="text-xs leading-relaxed text-muted-foreground">
+      {llmUsed
+        ? "Written by a language model from the computed evidence below. It rephrases the scores; it does not choose or reorder products."
+        : "Template sentence built from the computed evidence below (no language model is configured). Either way, the ranking itself is computed, not generated."}
+    </p>
+  );
+}
+
 export function ExplanationPanel({
   result,
-  req,
+  weights,
+  hasGoals,
+  llmUsed,
   onClose,
 }: {
-  result: ScoredProduct;
-  req: Requirements;
+  result: Recommendation;
+  weights: Record<string, number>;
+  hasGoals: boolean;
+  llmUsed: boolean;
   onClose: () => void;
 }) {
+  const matched = result.matched_ingredients;
+
   return (
     <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true">
       <button
@@ -78,8 +65,8 @@ export function ExplanationPanel({
         <div className="sticky top-0 flex items-start justify-between gap-6 border-b border-border bg-paper px-6 py-5">
           <div>
             <p className="eyebrow">Why this product</p>
-            <p className="mt-1.5 text-sm text-muted-foreground">{result.product.brand}</p>
-            <h2 className="display text-2xl">{result.product.name}</h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">{result.brand}</p>
+            <h2 className="display text-2xl">{result.product_name}</h2>
           </div>
           <button type="button" onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">
             Close
@@ -88,30 +75,59 @@ export function ExplanationPanel({
 
         <div className="space-y-10 px-6 py-8">
           <section>
-            <p className="eyebrow">Computed evidence</p>
-            <div className="mt-4">
-              <EvidenceList result={result} req={req} />
+            <p className="eyebrow">Summary</p>
+            <p className="mt-4 text-sm leading-relaxed">{result.explanation?.summary ?? "No summary available."}</p>
+            <div className="mt-3">
+              <SummaryNote llmUsed={llmUsed} />
             </div>
           </section>
 
           <section>
-            <ScoreBreakdown signals={result.signals} score={result.score} />
+            <p className="eyebrow">Strengths and weaknesses</p>
+            <div className="mt-4">
+              <EvidenceList result={result} />
+            </div>
+          </section>
+
+          <section>
+            <p className="eyebrow">
+              Matched ingredients{result.matched_goals.length ? ` · ${result.matched_goals.map(humanize).join(", ")}` : ""}
+            </p>
+            {matched.length ? (
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {matched.slice(0, 24).map((name) => (
+                  <IngredientBadge key={name} label={name} />
+                ))}
+                {matched.length > 24 ? (
+                  <span className="px-1 py-1 text-xs text-muted-foreground">+{matched.length - 24} more</span>
+                ) : null}
+              </div>
+            ) : (
+              <p className="mt-4 text-sm text-muted-foreground">
+                {hasGoals ? "None of the goal's ingredients were found." : "No goal was selected, so nothing was matched."}
+              </p>
+            )}
+          </section>
+
+          <section>
+            <ScoreBreakdown result={result} weights={weights} hasGoals={hasGoals} />
           </section>
 
           <section>
             <p className="eyebrow">Review signals</p>
             <div className="mt-4">
-              <ReviewInsights aspects={result.product.reviewAspects} />
+              <ReviewInsights aspects={result.review_score === null ? null : result.aspects} />
             </div>
           </section>
 
           <section className="border-t border-border pt-6">
-            <p className="eyebrow">Written explanation</p>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              The written summary is generated from the evidence above by the language model. It
-              rephrases the computed signals; it does not select or reorder products. Connect the
-              project API to generate it for live queries.
-            </p>
+            <Link
+              to="/product/$productId"
+              params={{ productId: result.product_id }}
+              className="link-underline text-sm"
+            >
+              Open the full product page →
+            </Link>
           </section>
         </div>
       </div>

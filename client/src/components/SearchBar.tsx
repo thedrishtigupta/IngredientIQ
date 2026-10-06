@@ -3,11 +3,12 @@ import { useState } from "react";
 type Props = {
   value?: string;
   placeholder?: string;
+  buttonLabel?: string;
   onSubmit: (value: string) => void;
   size?: "lg" | "md";
 };
 
-export function SearchBar({ value = "", placeholder, onSubmit, size = "lg" }: Props) {
+export function SearchBar({ value = "", placeholder, buttonLabel = "Search", onSubmit, size = "lg" }: Props) {
   const [text, setText] = useState(value);
 
   return (
@@ -21,13 +22,13 @@ export function SearchBar({ value = "", placeholder, onSubmit, size = "lg" }: Pr
       }`}
     >
       <label className="sr-only" htmlFor="requirement">
-        Describe what you need
+        {placeholder}
       </label>
       <input
         id="requirement"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder={placeholder ?? "I want a lightweight moisturizer under $50 without fragrance."}
+        placeholder={placeholder}
         className={`w-full bg-transparent text-foreground placeholder:text-muted-foreground/70 focus:outline-none ${
           size === "lg" ? "text-lg sm:text-2xl" : "text-base"
         }`}
@@ -38,7 +39,7 @@ export function SearchBar({ value = "", placeholder, onSubmit, size = "lg" }: Pr
           size === "lg" ? "text-xs sm:text-sm" : "text-[0.65rem]"
         }`}
       >
-        Find products
+        {buttonLabel}
       </button>
     </form>
   );

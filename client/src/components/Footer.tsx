@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { DATA_SOURCE_NOTE } from "@/lib/data";
+import { DataNote } from "./DataNote";
 
 export function Footer() {
   return (
@@ -9,8 +9,8 @@ export function Footer() {
           <p className="display text-2xl">IngredientIQ</p>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
             An explainable, ingredient-aware discovery and recommendation system. Rankings are
-            computed from ingredient composition, review-derived signals, rating, popularity and
-            price. Language models parse requirements and describe the evidence — they do not pick
+            computed from ingredient composition, review-derived signals, rating and popularity.
+            A language model, when one is configured, only words the explanation — it does not pick
             products.
           </p>
         </div>
@@ -29,7 +29,7 @@ export function Footer() {
             Non-medical. Findings are associational, not causal, and nothing here is diagnostic or
             dermatological advice.
           </p>
-          <p className="mt-4 leading-relaxed">{DATA_SOURCE_NOTE}</p>
+          <p className="mt-4 leading-relaxed"><DataNote /></p>
         </div>
       </div>
       <div className="border-t border-border">

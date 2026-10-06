@@ -1,14 +1,14 @@
-import type { FunctionGroup } from "@/lib/data";
+import { groupLabel } from "@/lib/labels";
 
-const tone: Record<FunctionGroup, string> = {
+// Only a few groups get a colour; every other group id falls back to the neutral style.
+const tone: Record<string, string> = {
   humectant: "border-olive/40 text-olive",
-  emollient: "border-border-strong text-muted-foreground",
-  occlusive: "border-border-strong text-muted-foreground",
+  botanical: "border-olive/40 text-olive",
+  uv_filter: "border-olive/40 text-olive",
   antioxidant: "border-accent/40 text-accent",
   exfoliant: "border-accent/40 text-accent",
-  "uv-filter": "border-olive/40 text-olive",
-  soothing: "border-olive/40 text-olive",
-  fragrance: "border-border-strong text-muted-foreground",
+  aha: "border-accent/40 text-accent",
+  bha: "border-accent/40 text-accent",
 };
 
 export function IngredientBadge({
@@ -17,23 +17,25 @@ export function IngredientBadge({
   onClick,
   active,
 }: {
-  label: string;
-  group?: FunctionGroup;
+  label?: string;
+  /** Functional group id; used for the colour and as the label when none is given. */
+  group?: string;
   onClick?: () => void;
   active?: boolean;
 }) {
   const cls = `inline-flex items-center border px-2.5 py-1 text-[0.68rem] uppercase tracking-[0.1em] transition-colors ${
-    group ? tone[group] : "border-border-strong text-muted-foreground"
+    (group && tone[group]) || "border-border-strong text-muted-foreground"
   } ${active ? "bg-foreground text-background border-foreground" : ""} ${
     onClick ? "hover:border-foreground hover:text-foreground" : ""
   }`;
+  const text = label ?? (group ? groupLabel(group) : "");
 
   if (onClick) {
     return (
       <button type="button" onClick={onClick} className={cls}>
-        {label}
+        {text}
       </button>
     );
   }
-  return <span className={cls}>{label}</span>;
+  return <span className={cls}>{text}</span>;
 }

@@ -1,8 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { ComparisonTable } from "@/components/ComparisonTable";
+import { ErrorNotice } from "@/components/ErrorNotice";
+import { SearchBar } from "@/components/SearchBar";
+import { ApiError, useProducts, useProductsById, type ProductDetail } from "@/lib/api";
 import { useCompare } from "@/lib/compare-store";
-import { PRODUCTS, productById } from "@/lib/data";
-import { emptyRequirements } from "@/lib/scoring";
 
 export const Route = createFileRoute("/compare")({
   head: () => ({
@@ -11,7 +13,7 @@ export const Route = createFileRoute("/compare")({
       {
         name: "description",
         content:
-          "Compare two or three products side by side on price, rating, popularity, functional ingredient groups, review sentiment and computed recommendation score.",
+          "Compare two or three products side by side on price, rating, popularity, functional ingredient groups and review sentiment.",
       },
       { property: "og:title", content: "Compare products — IngredientIQ" },
       {
@@ -25,7 +27,13 @@ export const Route = createFileRoute("/compare")({
 
 function Compare() {
   const { ids, toggle, clear, max } = useCompare();
-  const products = ids.map(productById).filter(Boolean) as typeof PRODUCTS;
+  const fetched = useProductsById(ids); // one query per id, same order as ids
+  const products = fetched.flatMap((q) => (q.data ? [q.data as ProductDetail] : []));
+  const failed = ids.flatMap((id, i) => (fetched[i]?.error ? [{ id, error: fetched[i]!.error }] : []));
+  const loading = fetched.some((q) => q.isLoading);
+
+  const [search, setSearch] = useState("");
+  const found = useProducts(search, 8, search !== "");
 
   return (
     <div className="mx-auto max-w-[1220px] px-5 py-12 sm:px-8">
@@ -34,7 +42,7 @@ function Compare() {
           <p className="eyebrow">Comparison</p>
           <h1 className="display mt-4 text-4xl sm:text-5xl">Side by side</h1>
         </div>
-        {products.length ? (
+        {ids.length ? (
           <button type="button" onClick={clear} className="link-underline text-sm text-muted-foreground">
             Clear all
           </button>
@@ -45,40 +53,70 @@ function Compare() {
         value for numeric rows only — text rows are left for you to read.
       </p>
 
+      {failed.map(({ id, error }) => (
+        <div key={id} className="mt-8">
+          <ErrorNotice error={error} />
+          <p className="mt-3 text-sm text-muted-foreground">
+            {error instanceof ApiError && error.status === 404 ? `Product ${id} is not in the dataset.` : `Product ${id} could not be loaded.`}{" "}
+            <button type="button" onClick={() => toggle(id)} className="link-underline text-foreground">
+              Remove it from the comparison
+            </button>
+          </p>
+        </div>
+      ))}
+
       {products.length ? (
         <div className="mt-12">
-          <ComparisonTable products={products} req={emptyRequirements} onRemove={toggle} />
+          <ComparisonTable products={products} onRemove={toggle} />
         </div>
-      ) : (
+      ) : loading ? (
+        <p className="mt-12 text-sm text-muted-foreground">Loading products…</p>
+      ) : !failed.length ? (
         <div className="mt-12 border border-dashed border-border-strong px-6 py-16 text-center">
           <p className="display text-2xl">Nothing selected yet</p>
           <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
-            Add products from the catalog — hover any product card and choose Compare, or use the
-            button on a product page.
+            Search for a product below, or hover any product card in Explore and choose Compare.
           </p>
-          <Link to="/explore" className="link-underline mt-6 inline-block text-sm">
-            Browse products →
-          </Link>
         </div>
-      )}
+      ) : null}
 
-      {products.length && products.length < max ? (
-        <div className="mt-14">
-          <p className="eyebrow">Add another</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {PRODUCTS.filter((p) => !ids.includes(p.id))
-              .slice(0, 8)
-              .map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => toggle(p.id)}
-                  className="border border-border px-3 py-2 text-xs text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
-                >
-                  {p.brand} · {p.name}
-                </button>
-              ))}
+      {ids.length < max ? (
+        <div className="mt-14 max-w-xl">
+          <p className="eyebrow">Add a product</p>
+          <div className="mt-4">
+            <SearchBar
+              size="md"
+              placeholder="Search by product name or brand"
+              buttonLabel="Search"
+              onSubmit={setSearch}
+            />
           </div>
+          {found.isLoading ? <p className="mt-4 text-sm text-muted-foreground">Searching…</p> : null}
+          {found.error ? (
+            <div className="mt-4">
+              <ErrorNotice error={found.error} />
+            </div>
+          ) : null}
+          {found.data ? (
+            found.data.length ? (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {found.data
+                  .filter((p) => !ids.includes(p.product_id))
+                  .map((p) => (
+                    <button
+                      key={p.product_id}
+                      type="button"
+                      onClick={() => toggle(p.product_id)}
+                      className="border border-border px-3 py-2 text-xs text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+                    >
+                      {p.brand} · {p.product_name}
+                    </button>
+                  ))}
+              </div>
+            ) : (
+              <p className="mt-4 text-sm text-muted-foreground">No product matches “{search}”.</p>
+            )
+          ) : null}
         </div>
       ) : null}
     </div>

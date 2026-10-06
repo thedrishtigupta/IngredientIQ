@@ -1,55 +1,126 @@
-import { CATEGORIES, FUNCTION_GROUPS, type Category, type FunctionGroup } from "@/lib/data";
-import type { Requirements } from "@/lib/scoring";
+import type { Category, Goal } from "@/lib/api";
+import type { SearchForm } from "@/lib/search-form";
 
 type Props = {
-  req: Requirements;
-  onChange: (next: Requirements) => void;
-  sort: string;
-  onSortChange: (s: string) => void;
+  form: SearchForm;
+  onChange: (next: SearchForm) => void;
+  onSubmit: () => void;
+  busy: boolean;
+  goals: Goal[] | undefined; // undefined while loading / failed
+  categories: Category[] | undefined;
 };
 
 const toggle = <T,>(arr: T[], v: T) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
 
-export function FilterPanel({ req, onChange, sort, onSortChange }: Props) {
+const chip = (active: boolean) =>
+  `border px-3 py-1.5 text-xs transition-colors ${
+    active
+      ? "border-foreground bg-foreground text-background"
+      : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
+  }`;
+
+const input =
+  "mt-3 w-full border border-border bg-transparent px-3 py-2 text-sm focus:border-foreground focus:outline-none";
+
+/** The structured search form. "Find products" sends it to POST /recommend (see Explore). */
+export function FilterPanel({ form, onChange, onSubmit, busy, goals, categories }: Props) {
+  const subcategories =
+    categories
+      ?.find((c) => c.category === form.category)
+      ?.subcategories.filter((s) => s.name !== "NaN") ?? []; // the dataset has a few literal "NaN" subcategories
+
   return (
-    <div className="space-y-9">
+    <form
+      className="space-y-9"
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit();
+      }}
+    >
+      <section>
+        <p className="eyebrow">Goals</p>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {goals ? (
+            goals.map((g) => (
+              <button
+                key={g.id}
+                type="button"
+                onClick={() => onChange({ ...form, goals: toggle(form.goals, g.id) })}
+                aria-pressed={form.goals.includes(g.id)}
+                className={chip(form.goals.includes(g.id))}
+              >
+                {g.label}
+              </button>
+            ))
+          ) : (
+            <span className="text-xs text-muted-foreground">Loading goals…</span>
+          )}
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Pick none to rank on rating, popularity and reviews only.
+        </p>
+      </section>
+
       <section>
         <p className="eyebrow">Category</p>
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {CATEGORIES.map((c: Category) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => onChange({ ...req, category: req.category === c ? null : c })}
-              className={`border px-3 py-1.5 text-xs transition-colors ${
-                req.category === c
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
-              }`}
-            >
-              {c}
-            </button>
-          ))}
+          {categories ? (
+            categories.map((c) => (
+              <button
+                key={c.category}
+                type="button"
+                onClick={() =>
+                  onChange({
+                    ...form,
+                    category: form.category === c.category ? null : c.category,
+                    subcategory: null,
+                  })
+                }
+                aria-pressed={form.category === c.category}
+                className={chip(form.category === c.category)}
+              >
+                {c.category}
+              </button>
+            ))
+          ) : (
+            <span className="text-xs text-muted-foreground">Loading categories…</span>
+          )}
         </div>
+        {subcategories.length ? (
+          <select
+            aria-label="Subcategory"
+            value={form.subcategory ?? ""}
+            onChange={(e) => onChange({ ...form, subcategory: e.target.value || null })}
+            className={input}
+          >
+            <option value="">Any subcategory</option>
+            {subcategories.map((s) => (
+              <option key={s.name} value={s.name}>
+                {s.name} ({s.product_count})
+              </option>
+            ))}
+          </select>
+        ) : null}
       </section>
 
       <section>
         <div className="flex items-baseline justify-between">
           <p className="eyebrow">Budget</p>
-          <p className="numeric text-xs">{req.budget ? `$${req.budget}` : "Any"}</p>
+          <p className="numeric text-xs">{form.maxPrice ? `Up to $${form.maxPrice}` : "Any"}</p>
         </div>
         <input
           type="range"
-          min={15}
-          max={100}
-          step={1}
-          value={req.budget ?? 100}
-          onChange={(e) => onChange({ ...req, budget: Number(e.target.value) })}
+          aria-label="Maximum price"
+          min={10}
+          max={200}
+          step={5}
+          value={form.maxPrice ?? 200}
+          onChange={(e) => onChange({ ...form, maxPrice: Number(e.target.value) })}
           className="mt-3 w-full accent-[var(--color-accent)]"
         />
         <button
           type="button"
-          onClick={() => onChange({ ...req, budget: null })}
+          onClick={() => onChange({ ...form, maxPrice: null })}
           className="mt-2 text-xs text-muted-foreground link-underline"
         >
           Clear budget
@@ -57,56 +128,40 @@ export function FilterPanel({ req, onChange, sort, onSortChange }: Props) {
       </section>
 
       <section>
-        <p className="eyebrow">Desired functions</p>
-        <div className="mt-3 space-y-2">
-          {FUNCTION_GROUPS.filter((g) => g.id !== "fragrance").map((g) => (
-            <label key={g.id} className="flex cursor-pointer items-start gap-3 text-sm">
-              <input
-                type="checkbox"
-                checked={req.functions.includes(g.id)}
-                onChange={() => onChange({ ...req, functions: toggle(req.functions, g.id) })}
-                className="mt-1 h-3.5 w-3.5 accent-[var(--color-accent)]"
-              />
-              <span>
-                {g.label}
-                <span className="block text-xs text-muted-foreground">{g.blurb}</span>
-              </span>
-            </label>
-          ))}
-        </div>
+        <p className="eyebrow">Ingredients</p>
+        <label className="mt-3 flex cursor-pointer items-center gap-3 text-sm">
+          <input
+            type="checkbox"
+            checked={form.fragranceFree}
+            onChange={() => onChange({ ...form, fragranceFree: !form.fragranceFree })}
+            className="h-3.5 w-3.5 accent-[var(--color-accent)]"
+          />
+          Fragrance-free
+        </label>
+        <input
+          aria-label="Must contain"
+          value={form.required}
+          onChange={(e) => onChange({ ...form, required: e.target.value })}
+          placeholder="Must contain, e.g. niacinamide"
+          className={input}
+        />
+        <input
+          aria-label="Must not contain"
+          value={form.excluded}
+          onChange={(e) => onChange({ ...form, excluded: e.target.value })}
+          placeholder="Must not contain, e.g. alcohol"
+          className={input}
+        />
+        <p className="mt-2 text-xs text-muted-foreground">Separate several names with commas.</p>
       </section>
 
-      <section>
-        <p className="eyebrow">Avoid</p>
-        <div className="mt-3 space-y-2">
-          {(["fragrance", "exfoliant", "occlusive"] as FunctionGroup[]).map((g) => (
-            <label key={g} className="flex cursor-pointer items-center gap-3 text-sm">
-              <input
-                type="checkbox"
-                checked={req.avoid.includes(g)}
-                onChange={() => onChange({ ...req, avoid: toggle(req.avoid, g) })}
-                className="h-3.5 w-3.5 accent-[var(--color-accent)]"
-              />
-              {FUNCTION_GROUPS.find((f) => f.id === g)?.label}
-            </label>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <p className="eyebrow">Sort</p>
-        <select
-          value={sort}
-          onChange={(e) => onSortChange(e.target.value)}
-          className="mt-3 w-full border border-border bg-transparent px-3 py-2 text-sm focus:border-foreground focus:outline-none"
-        >
-          <option value="score">Recommendation score</option>
-          <option value="rating">Rating</option>
-          <option value="price-asc">Price, low to high</option>
-          <option value="price-desc">Price, high to low</option>
-          <option value="loves">Popularity</option>
-        </select>
-      </section>
-    </div>
+      <button
+        type="submit"
+        disabled={busy}
+        className="w-full border border-foreground px-5 py-3 text-xs uppercase tracking-[0.14em] transition-colors hover:bg-foreground hover:text-background disabled:opacity-50"
+      >
+        {busy ? "Finding…" : "Find products"}
+      </button>
+    </form>
   );
 }

@@ -1,10 +1,13 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { SearchBar } from "@/components/SearchBar";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { DataNote } from "@/components/DataNote";
+import { ErrorNotice } from "@/components/ErrorNotice";
+import { EvidenceList, SummaryNote } from "@/components/RecommendationExplanation";
 import { ProductGrid } from "@/components/ProductGrid";
+import { ProductImage } from "@/components/ProductImage";
 import { ScoreBreakdown } from "@/components/ScoreBreakdown";
-import { EvidenceList } from "@/components/RecommendationExplanation";
-import { PRODUCTS, DATA_SOURCE_NOTE } from "@/lib/data";
-import { EXAMPLE_QUERIES, parseRequirements, recommend } from "@/lib/scoring";
+import { useHealth, useProducts, useRecommend } from "@/lib/api";
+import { fmtInt, fmtPrice, fmtRating } from "@/lib/labels";
+import { PRESETS, toBody } from "@/lib/search-form";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -13,7 +16,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "IngredientIQ ranks beauty products from ingredient composition, review signals, rating, popularity and price — and shows the evidence behind every recommendation.",
+          "IngredientIQ ranks beauty products from ingredient composition, review signals, rating and popularity — and shows the evidence behind every recommendation.",
       },
       { property: "og:title", content: "IngredientIQ — Find beauty products by what's inside them" },
       {
@@ -26,23 +29,21 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const DEMO_QUERY = "Hydrating moisturizer under $50, no fragrance.";
+// The first example doubles as the live worked example further down the page.
+const WORKED_EXAMPLE = PRESETS[0]!;
 
 const steps = [
-  { n: "01", t: "Tell us what you need", d: "Plain language: category, texture, budget, anything to avoid." },
-  { n: "02", t: "Requirements are parsed", d: "The query becomes structured filters — category, budget, functional groups, exclusions." },
-  { n: "03", t: "Products are ranked on evidence", d: "Ingredient match, review signals, rating, popularity and price are combined into one weighted score." },
-  { n: "04", t: "See exactly why it matched", d: "Every result opens into the computed signals behind its position." },
+  { n: "01", t: "Pick what you need", d: "Choose goals such as hydration or brightening, then a category, a budget and ingredients to include or avoid." },
+  { n: "02", t: "Products are filtered", d: "Anything outside your category, budget or ingredient rules is removed before scoring." },
+  { n: "03", t: "Products are ranked on evidence", d: "Ingredient match, ingredient similarity, product-type fit, review sentiment, rating and popularity are combined into one weighted score." },
+  { n: "04", t: "See exactly why it matched", d: "Every result opens into the computed scores, matched ingredients and review aspects behind its position." },
 ];
 
 function Home() {
-  const navigate = useNavigate();
-  const go = (q: string) =>
-    navigate({ to: "/explore", search: { q } as never });
-
-  const req = parseRequirements(DEMO_QUERY);
-  const demo = recommend(req)[0];
-  const curated = PRODUCTS.slice(0, 8);
+  const health = useHealth().data;
+  const loved = useProducts("", 8);
+  const example = useRecommend(toBody(WORKED_EXAMPLE.form, 1));
+  const top = example.data?.results[0];
 
   return (
     <>
@@ -57,27 +58,48 @@ function Home() {
           </div>
           <p className="max-w-md text-[0.95rem] leading-relaxed text-muted-foreground lg:pb-3">
             IngredientIQ reads ingredient lists as functional composition, combines that with
-            review-derived signals, rating, popularity and price, and produces recommendations you
-            can inspect line by line.
+            review-derived signals, rating and popularity, and produces recommendations you can
+            inspect line by line.
           </p>
         </div>
 
         <div className="mt-14 max-w-3xl">
-          <SearchBar onSubmit={(v) => go(v || DEMO_QUERY)} />
-          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <Link
+            to="/explore"
+            className="inline-block border border-foreground px-6 py-3 text-xs uppercase tracking-[0.14em] transition-colors hover:bg-foreground hover:text-background"
+          >
+            Find products
+          </Link>
+          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
             <span className="eyebrow">Try</span>
-            {EXAMPLE_QUERIES.map((q) => (
-              <button
-                key={q}
-                type="button"
-                onClick={() => go(q)}
+            {PRESETS.map((p) => (
+              <Link
+                key={p.id}
+                to="/explore"
+                search={{ preset: p.id }}
                 className="link-underline text-sm text-muted-foreground hover:text-foreground"
               >
-                {q}
-              </button>
+                {p.label}
+              </Link>
             ))}
           </div>
         </div>
+
+        <dl className="mt-16 grid max-w-3xl grid-cols-3 gap-6 border-y border-border py-6">
+          {[
+            ["Products", health?.products],
+            ["Reviews", health?.reviews],
+            ["Products with reviews", health?.reviewed_products],
+          ].map(([label, value]) => (
+            <div key={label as string}>
+              <dt className="eyebrow">{label}</dt>
+              <dd className="numeric mt-1.5 text-xl sm:text-2xl">{typeof value === "number" ? fmtInt(value) : "—"}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-3 max-w-3xl text-xs leading-relaxed text-muted-foreground">
+          <DataNote />
+        </p>
       </section>
 
       {/* How it works */}
@@ -86,8 +108,8 @@ function Home() {
           <div className="flex flex-wrap items-baseline justify-between gap-4">
             <h2 className="display text-3xl">How it works</h2>
             <p className="max-w-sm text-sm text-muted-foreground">
-              The ranking is computed. The language model parses your sentence and describes the
-              result — it never chooses the products.
+              The ranking is computed. A language model, when configured, only words the
+              explanation — it never chooses the products.
             </p>
           </div>
           <ol className="mt-12 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -105,59 +127,63 @@ function Home() {
       {/* Explore */}
       <section className="mx-auto max-w-[1220px] px-5 py-20 sm:px-8">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 className="display text-3xl">Explore the catalog</h2>
+          <h2 className="display text-3xl">Most-loved products</h2>
           <Link to="/explore" className="link-underline text-sm">
-            All products and filters →
+            Search with goals and filters →
           </Link>
         </div>
-        <p className="mt-3 max-w-xl text-sm text-muted-foreground">{DATA_SOURCE_NOTE}</p>
+        <p className="mt-3 max-w-xl text-sm text-muted-foreground">
+          The most-loved products in the catalog, regardless of goal. Product photos are
+          placeholders: the dataset has none.
+        </p>
         <div className="mt-12">
-          <ProductGrid products={curated} />
+          {loved.error ? (
+            <ErrorNotice error={loved.error} />
+          ) : loved.data ? (
+            <ProductGrid products={loved.data} />
+          ) : (
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          )}
         </div>
       </section>
 
       {/* Explainability */}
-      {demo ? (
-        <section className="border-y border-border bg-paper">
-          <div className="mx-auto max-w-[1220px] px-5 py-20 sm:px-8">
-            <div className="max-w-2xl">
-              <p className="eyebrow">Explainability</p>
-              <h2 className="display mt-4 text-3xl sm:text-4xl">
-                Evidence, not a chat answer.
-              </h2>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                A worked example against the demo catalog. Every line below is computed from
-                product data before any text is written.
-              </p>
-            </div>
+      <section className="border-y border-border bg-paper">
+        <div className="mx-auto max-w-[1220px] px-5 py-20 sm:px-8">
+          <div className="max-w-2xl">
+            <p className="eyebrow">Explainability</p>
+            <h2 className="display mt-4 text-3xl sm:text-4xl">Evidence, not a chat answer.</h2>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              A live worked example: the top result of a real search. Every score below is computed
+              from product data before any text is written.
+            </p>
+          </div>
 
+          {example.error ? (
+            <div className="mt-12">
+              <ErrorNotice error={example.error} />
+            </div>
+          ) : top && example.data ? (
             <div className="mt-12 grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
               <div>
                 <div className="border-l-2 border-accent pl-4">
-                  <p className="eyebrow">User query</p>
-                  <p className="display mt-2 text-xl">“{DEMO_QUERY}”</p>
+                  <p className="eyebrow">Search</p>
+                  <p className="display mt-2 text-xl">“{WORKED_EXAMPLE.label}”</p>
                 </div>
                 <div className="mt-8 flex gap-6">
-                  <img
-                    src={demo.product.image}
-                    alt={demo.product.name}
-                    width={900}
-                    height={1100}
-                    loading="lazy"
-                    className="aspect-[4/5] w-32 shrink-0 object-cover sm:w-40"
-                  />
+                  <div className="w-32 shrink-0 sm:w-40">
+                    <ProductImage id={top.product_id} alt={top.product_name} />
+                  </div>
                   <div>
-                    <p className="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground">
-                      {demo.product.brand}
-                    </p>
-                    <h3 className="display mt-1 text-2xl">{demo.product.name}</h3>
-                    <p className="numeric mt-3 text-sm">${demo.product.price}</p>
+                    <p className="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground">{top.brand}</p>
+                    <h3 className="display mt-1 text-2xl">{top.product_name}</h3>
+                    <p className="numeric mt-3 text-sm">{fmtPrice(top.price)}</p>
                     <p className="numeric text-xs text-muted-foreground">
-                      {demo.product.rating.toFixed(1)} ★ · {demo.product.reviewCount.toLocaleString()} reviews
+                      {fmtRating(top.rating)} ★ · {fmtInt(top.review_count ?? 0)} reviews
                     </p>
                     <Link
                       to="/product/$productId"
-                      params={{ productId: demo.product.id }}
+                      params={{ productId: top.product_id }}
                       className="link-underline mt-4 inline-block text-sm"
                     >
                       Open product →
@@ -166,19 +192,29 @@ function Home() {
                 </div>
                 <div className="mt-8">
                   <p className="eyebrow">Why this matches</p>
-                  <div className="mt-4">
-                    <EvidenceList result={demo} req={req} />
+                  <p className="mt-4 text-sm leading-relaxed">{top.explanation?.summary}</p>
+                  <div className="mt-3">
+                    <SummaryNote llmUsed={example.data.llm_used} />
+                  </div>
+                  <div className="mt-5">
+                    <EvidenceList result={top} />
                   </div>
                 </div>
               </div>
 
               <div className="border border-border bg-background p-6 sm:p-8">
-                <ScoreBreakdown signals={demo.signals} score={demo.score} />
+                <ScoreBreakdown
+                  result={top}
+                  weights={example.data.weights}
+                  hasGoals={example.data.request.goals.length > 0}
+                />
               </div>
             </div>
-          </div>
-        </section>
-      ) : null}
+          ) : (
+            <p className="mt-12 text-sm text-muted-foreground">Running the example search…</p>
+          )}
+        </div>
+      </section>
 
       {/* Research teaser */}
       <section className="mx-auto max-w-[1220px] px-5 py-20 sm:px-8">

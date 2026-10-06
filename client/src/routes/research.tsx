@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AssociationChart, ModelComparisonChart } from "@/components/ResearchChart";
 import { SHAPChart } from "@/components/SHAPChart";
-import { researchStatus } from "@/lib/data";
+import { researchStatus } from "@/lib/research";
 
 export const Route = createFileRoute("/research")({
   head: () => ({

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-const KEY = "iq-compare";
+const KEY = "iq-compare-v2"; // v2: product ids now come from the API (the demo ids are ignored)
 const MAX = 3;
 
 let memory: string[] = [];
@@ -19,7 +19,9 @@ function persist() {
 }
 
 export function useCompare() {
-  const [ids, setIds] = useState<string[]>(memory);
+  // Start empty (as the server does) and load the saved ids in the effect below; starting from `memory`
+  // made the server HTML differ from the first client render when ids were saved.
+  const [ids, setIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (!memory.length) {
