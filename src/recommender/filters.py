@@ -1,11 +1,27 @@
 from .models import RecommendationRequest
 
+# "Fragrance-free": if the user excludes "fragrance" or "parfum", we drop every
+# product that has ANY ingredient whose name contains one of these words
+# (the database spells it many ways: "parfum (fragrance)", "fragrance/parfum" ...).
+# Individual fragrance allergens (limonene, linalool ...) are NOT covered
+# unless the user lists them by name.
+FRAGRANCE_WORDS = ("fragrance", "parfum")
+
 
 def normalize(value: str | None) -> str | None:
     if value is None:
         return None
 
     return value.strip().lower()
+
+
+def has_fragrance(ingredients) -> bool:
+    """True if any ingredient name contains "fragrance" or "parfum"."""
+    return any(
+        word in name
+        for name in ingredients
+        for word in FRAGRANCE_WORDS
+    )
 
 
 def filter_products(
@@ -25,6 +41,8 @@ def filter_products(
         normalize(name)
         for name in request.excluded_ingredients
     }
+
+    fragrance_free = any(word in excluded for word in FRAGRANCE_WORDS)
 
     results = []
 
@@ -64,6 +82,9 @@ def filter_products(
             continue
 
         if excluded and ingredients.intersection(excluded):
+            continue
+
+        if fragrance_free and has_fragrance(ingredients):
             continue
 
         results.append(product)

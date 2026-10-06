@@ -44,11 +44,11 @@ class ProductRepository:
 
         if category:
             query += " AND LOWER(category) = LOWER(%s)"
-            params.append(category)
+            params.append(category.strip())
 
         if subcategory:
             query += " AND LOWER(subcategory) = LOWER(%s)"
-            params.append(subcategory)
+            params.append(subcategory.strip())
 
         if min_price is not None:
             query += " AND price >= %s"
@@ -145,5 +145,69 @@ class ProductRepository:
                 product_match["ingredients"].add(
                     ingredient_name
                 )
+
+        return result
+
+    def count_goal_ingredients(self, goals):
+        """How many different ingredients the knowledge table lists for these goals."""
+        if not goals:
+            return 0
+
+        query = """
+            SELECT COUNT(DISTINCT ik.ingredient_id)
+            FROM ingredient_knowledge ik
+            CROSS JOIN LATERAL jsonb_array_elements_text(
+                ik.user_goals
+            ) AS goal(value)
+            WHERE LOWER(goal.value) = ANY(%s)
+        """
+
+        with self.connection.cursor() as cur:
+            cur.execute(query, (goals,))
+            return cur.fetchone()[0]
+
+    def get_review_signals(self, product_ids):
+        """
+        Review-NLP results for the given products.
+
+        Returns {product_id: {"review_score", "avg_sentiment",
+        "analyzed_count", "aspects"}}. Products with no row are simply
+        missing from the result. If the table does not exist yet, returns {}.
+        """
+        if not product_ids:
+            return {}
+
+        query = """
+            SELECT
+                product_id,
+                review_score,
+                avg_sentiment,
+                analyzed_count,
+                aspects
+            FROM product_review_signals
+            WHERE product_id = ANY(%s)
+              AND review_score IS NOT NULL
+        """
+
+        try:
+            with self.connection.cursor() as cur:
+                cur.execute(query, (product_ids,))
+                rows = cur.fetchall()
+        except psycopg.errors.UndefinedTable:
+            # The failed query leaves the transaction broken, so reset it.
+            self.connection.rollback()
+            return {}
+
+        result = {}
+
+        for product_id, score, sentiment, analyzed, aspects in rows:
+            result[product_id] = {
+                "review_score": float(score),
+                "avg_sentiment": (
+                    float(sentiment) if sentiment is not None else None
+                ),
+                "analyzed_count": analyzed,
+                "aspects": aspects or {},
+            }
 
         return result

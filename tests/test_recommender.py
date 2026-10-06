@@ -1,6 +1,7 @@
 from src.recommender.models import RecommendationRequest
 from src.recommender.scorer import (
-    calculate_score,
+    component_scores,
+    hybrid_score,
     product_intent_score,
     rating_score,
     saturating_score,
@@ -33,37 +34,31 @@ def test_product_intent_score():
         ["hydration"],
     ) == 0.45
 
-    assert product_intent_score(
-        "Unknown",
-        ["hydration"],
-    ) == 0.5
+    # A type missing from the goal's list is a poor fit; an unknown goal is neutral.
+    assert product_intent_score("Unknown", ["hydration"]) == 0.25
+    assert product_intent_score("Moisturizers", ["no_such_goal"]) == 0.5
 
 
-def test_calculate_score():
-    result = calculate_score(
+def test_component_scores():
+    components = component_scores(
         match_count=3,
         rating=4.5,
         review_count=100,
         loves_count=50,
         subcategory="Moisturizers",
         goals=["hydration"],
+        similarity=0.8,
+        review_score=0.7,
     )
 
-    assert len(result) == 5
+    assert 0.0 < components["goal"] < 1.0
+    assert components["similarity"] == 0.8
+    assert components["intent"] == 1.0
+    assert components["review"] == 0.7
+    assert components["rating"] == 0.9
+    assert 0.0 <= components["popularity"] <= 1.0
 
-    (
-        final_score,
-        goal_score,
-        intent_score,
-        rating_component,
-        popularity_component,
-    ) = result
-
-    assert 0.0 < final_score <= 1.0
-    assert 0.0 < goal_score < 1.0
-    assert intent_score == 1.0
-    assert rating_component == 0.9
-    assert 0.0 <= popularity_component <= 1.0
+    assert 0.0 < hybrid_score(components) <= 1.0
 
 
 def test_recommendation_request_defaults():

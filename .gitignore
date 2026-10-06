@@ -29,6 +29,9 @@ data/processed/
 
 # Large/local data files
 *.csv
+*.zip
+archive*/
+drive-download-*/
 *.parquet
 *.feather
 *.pickle
