@@ -26,15 +26,15 @@ Basic Recommendation Engine ✅
   ↓
 Explainable Ranking ✅
   ↓
-Review Intelligence
+Review Intelligence ✅
   ↓
-Hybrid Recommendation Engine
+Hybrid Recommendation Engine ✅
   ↓
-Natural Language / LLM Interface
+LLM Explanations (OpenRouter) ✅
   ↓
-Frontend
+FastAPI backend + Frontend ✅
   ↓
-Evaluation
+Evaluation ✅
 ```
 
 The data and database foundation is complete, and the first deterministic
@@ -227,10 +227,71 @@ The recommendation result can be serialized using:
 ```python
 result.to_dict()
 ```
-The full test suite currently passes:
+Run the full test suite with `python -m pytest -q`.
+
+---
+
+### Phase 7 — Review Intelligence
+
+Every review is scored with VADER (a rule-based sentiment lexicon, no model to
+download). Per product we store the average sentiment, positive/negative share,
+a 0–1 `review_score` and per-aspect sentiment (hydration, texture, scent,
+absorption, packaging, value, effectiveness) in `product_review_signals`.
+The score is smoothed toward the global average, so a product with 3 reviews
+cannot look perfect. Products without reviews get **no row** (nothing is invented).
+
+```text
+python -m scripts.run_review_nlp        # ~12 min for 1.09M reviews
 ```
-40 passed
+
+Code: `src/reviews/`. Result: 2,351 products scored; review sentiment correlates
+0.73 with star ratings.
+
+### Phase 8 — Ingredient Vectors + Hybrid Recommender
+
+Each product becomes a **vector**: a list of numbers saying how much of its
+ingredient list does each job (humectant, emollient, exfoliant, ...). A user goal
+(e.g. hydration) becomes a vector of the jobs that goal needs. **Cosine
+similarity** measures how close the two vectors point (1 = same direction,
+0 = unrelated). Code: `src/recommender/vectors.py` (numpy only).
+
+The final score combines six signals:
+
+```text
+Ingredient match   30%   share of the goal's ingredients present
+Vector similarity  20%   cosine(goal vector, product vector)
+Product type       15%   does the product type fit the goal
+Review sentiment   15%   from Phase 7 (dropped if the product has no reviews)
+Rating             12%
+Popularity          8%
 ```
+
+If a signal is missing (no reviews, or no goal given) its weight is dropped and
+the others are renormalised.
+
+### Phase 9 — LLM Explanations (OpenRouter)
+
+The database and scoring code choose the products. The LLM only turns the
+already-computed facts into 2–3 plain sentences (`src/llm/openrouter.py`).
+Without an API key it falls back to template sentences, so everything works offline.
+Put `OPENROUTER_API_KEY` in `.env` to switch it on (model: `OPENROUTER_MODEL`).
+
+### Phase 10 — API and Frontend
+
+FastAPI backend (`src/api/`, endpoint reference in `docs/API.md`) and the React
+frontend in `client/` now use the real data.
+
+```powershell
+.venv\Scripts\python.exe -m uvicorn src.api.main:app --port 8000   # API  (docs at /docs)
+cd client; npm install; npm run dev                                 # frontend
+```
+
+### Phase 11 — Evaluation
+
+`python -m scripts.evaluate_recommender` checks constraints (budget, excluded
+ingredients, determinism) and compares the hybrid ranking with random, popularity-only,
+rating-only and ingredient-only baselines. Write-up: `docs/EVALUATION.md`.
+
 ---
 
 # Project Structure
@@ -332,7 +393,48 @@ ingredientiq.dump
 
 ---
 
-# Local Setup
+# Quick Start (Docker — recommended)
+
+The whole local database runs in one Docker container. You do **not** need to
+install PostgreSQL or know any password.
+
+Needs: Docker Desktop (running), Python 3.11+, and the database dump file
+(`ingredientiq.dump` from the team Drive, or `ingredientiq_full.dump` which
+also contains the review signals).
+
+```powershell
+# 1. Python environment
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+# 2. Database: starts Postgres in Docker and restores the dump (a few minutes, once)
+.\scripts\setup_db.ps1 -Dump D:\path\to\ingredientiq_full.dump
+
+# 3. (Only if you restored the ORIGINAL ingredientiq.dump) compute the review signals
+python -m scripts.run_review_nlp
+
+# 4. Run the tests
+python -m pytest -q
+```
+
+`setup_db.ps1` is safe to re-run: it skips the restore when the data is already
+there (`-Force` wipes and restores again). Settings live in `.env`
+(created from `.env.example`; never commit it).
+
+To send your database to a teammate, run `.\scripts\export_db.ps1` and share the
+`ingredientiq_full.dump` it creates.
+
+More documentation:
+
+- [`docs/WHAT_WAS_BUILT.md`](docs/WHAT_WAS_BUILT.md) — everything that was built, in plain words (start here if you are new)
+- [`docs/DATABASE.md`](docs/DATABASE.md) — the Postgres setup and how dump/restore works
+- [`docs/API.md`](docs/API.md) — backend endpoints with example JSON
+- [`docs/EVALUATION.md`](docs/EVALUATION.md) — how the recommendations were tested and the results
+
+---
+
+# Local Setup (manual alternative, without Docker)
 
 ## 1. Clone the Repository
 
@@ -811,23 +913,9 @@ data pipelines.
 
 ---
 
-# Next Development Phase
+# Possible Next Steps
 
-The data foundation, database layer, deterministic recommendation engine,
-and explainable ranking layer are complete.
-
-The next major phase is:
-
-```text
-Review Intelligence
-```
-
-
-Later phases will add:
-
-1. Review Intelligence
-2. Hybrid Recommendation Engine
-3. Natural Language / LLM Interface
-4. Frontend Integration
-5. Recommendation Evaluation
-6. Deployment
+- Add a real OpenRouter key and tune the explanation prompt.
+- Per-skin-type review signals (the review data has skin type, tone, hair colour).
+- Grow the ingredient knowledge table (only 705 of 12,512 ingredients are mapped).
+- Swap VADER for a transformer sentiment model (or the Jev classifier) if more accuracy is needed.
