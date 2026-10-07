@@ -178,3 +178,48 @@ def test_default_model_when_env_unset(monkeypatch):
 def test_empty_results(monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", KEY)
     assert explain_results([], ["hydration"], client=fake_client(no_network)) == {}
+
+
+# ---------------------------------------------------------------------------
+# The shopper's choices (budget, category, fragrance-free) are sent to the model
+# ---------------------------------------------------------------------------
+
+def test_user_choices_keeps_only_what_the_shopper_set():
+    from src.llm.openrouter import user_choices
+    from src.recommender import RecommendationRequest
+
+    request = RecommendationRequest(
+        goals=["hydration"], category="Skincare", max_price=50,
+        excluded_ingredients=["Fragrance", "alcohol"],
+    )
+
+    assert user_choices(request) == {
+        "goals": ["hydration"],
+        "category": "Skincare",
+        "max_price_usd": 50,
+        "fragrance_free": True,
+        "excluded_ingredients": ["alcohol"],
+    }
+
+
+def test_choices_are_in_the_outgoing_request(monkeypatch):
+    import json
+    import httpx
+    from src.llm import openrouter
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key-not-real")
+    seen = {}
+
+    def handler(request):
+        seen["body"] = json.loads(request.content)
+        return httpx.Response(200, json={"choices": [{"message": {"content": "{}"}}]})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    result = make_result()
+    openrouter.explain_results(
+        [result], ["hydration"], client=client, choices={"goals": ["hydration"], "max_price_usd": 50}
+    )
+
+    sent = json.loads(seen["body"]["messages"][1]["content"])
+    assert sent["user_choices"] == {"goals": ["hydration"], "max_price_usd": 50}
+    assert "matched_ingredients" in openrouter.RULES  # the wording rule is in the system prompt

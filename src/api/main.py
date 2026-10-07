@@ -25,7 +25,7 @@ from src.api.schemas import (
     RecommendResponse,
     SimilarProduct,
 )
-from src.llm.openrouter import explain_results, llm_enabled, template_summary
+from src.llm.openrouter import explain_results, llm_enabled, template_summary, user_choices
 from src.recommender import RecommendationEngine, RecommendationRequest
 from src.recommender.config import GOAL_LABELS, HYBRID_WEIGHTS
 from src.recommender.repository import ProductRepository
@@ -173,24 +173,23 @@ def categories(repo=Depends(get_repo)):
 def recommend(body: RecommendBody, repo=Depends(get_repo)):
     """Rank products for the user's goals and filters, best first."""
     engine = RecommendationEngine(repository=repo, vector_index=get_index(repo.connection))
-    results = engine.recommend(
-        RecommendationRequest(
-            category=body.category,
-            subcategory=body.subcategory,
-            min_price=body.min_price,
-            max_price=body.max_price,
-            goals=body.goals,
-            required_ingredients=body.required_ingredients,
-            excluded_ingredients=body.excluded_ingredients,
-            top_k=body.top_k,
-        )
+    request = RecommendationRequest(
+        category=body.category,
+        subcategory=body.subcategory,
+        min_price=body.min_price,
+        max_price=body.max_price,
+        goals=body.goals,
+        required_ingredients=body.required_ingredients,
+        excluded_ingredients=body.excluded_ingredients,
+        top_k=body.top_k,
     )
+    results = engine.recommend(request)
 
     items = [r.to_dict() for r in results]
     llm_wrote_text = False
     if body.explain:
         # LLM text if a key is set, otherwise a fixed template. Never raises.
-        texts = explain_results(results, body.goals)
+        texts = explain_results(results, body.goals, choices=user_choices(request))
         # True only if at least one text really came from the LLM (not the template fallback).
         llm_wrote_text = llm_enabled() and any(
             texts.get(r.product_id) != template_summary(r, body.goals) for r in results

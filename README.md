@@ -427,6 +427,7 @@ To send your database to a teammate, run `.\scripts\export_db.ps1` and share the
 
 More documentation:
 
+- [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md) — full handoff file; also paste it into an LLM to give it context
 - [`docs/WHAT_WAS_BUILT.md`](docs/WHAT_WAS_BUILT.md) — everything that was built, in plain words (start here if you are new)
 - [`docs/DATABASE.md`](docs/DATABASE.md) — the Postgres setup and how dump/restore works
 - [`docs/API.md`](docs/API.md) — backend endpoints with example JSON

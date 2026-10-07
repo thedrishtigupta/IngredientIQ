@@ -99,6 +99,9 @@ Database (Postgres)  ──►  Scoring code  ──►  Top 10 products  ──
 - **Now:** `src/llm/openrouter.py`. After the code has chosen the top products, we send the
   *facts* (name, ingredients, scores) to a small AI model (`google/gemini-2.5-flash-lite`
   through OpenRouter) and ask it to write 2–3 friendly sentences per product.
+- **It also sees what the shopper chose** (goal, category, budget, fragrance-free), so it can
+  say things like "at $42 it is within your $50 budget and has no fragrance or parfum listed".
+  It is told to name only ingredients from the matched list, never ones that only appear in the product name.
 - **Important design rule:** the LLM never chooses products. It can't invent a product,
   because it only describes the ones already picked. If the LLM fails or there is no key,
   the app silently uses template sentences instead, so it never breaks.

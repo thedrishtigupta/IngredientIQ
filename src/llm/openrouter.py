@@ -36,6 +36,12 @@ RULES = (
     "benefits or products.\n"
     "- Make no medical or dermatological claims (never say a product treats, cures, "
     "heals or fixes a skin condition).\n"
+    "- Mention an ingredient ONLY if it is in that product's matched_ingredients. Do not "
+    "describe ingredients or benefits that appear only in the product name.\n"
+    "- user_choices says what the shopper asked for (goals, category, budget, fragrance-free...). "
+    "Every product already satisfies these choices, so you may say how it fits them, "
+    "e.g. 'at $30 it is within your $50 budget'. For fragrance-free say 'no fragrance or "
+    "parfum listed', never 'free of all fragrance allergens'.\n"
     "- Write 2 to 3 friendly plain-English sentences per product.\n"
     '- Reply with ONLY a JSON object mapping each product id to its text, like '
     '{"P123": "..."}. No markdown and no extra keys.'
@@ -62,6 +68,23 @@ def _best_worst_aspect(aspects: dict):
     best = max(shares, key=shares.get)
     worst = min(shares, key=shares.get)
     return (best, shares[best]), ((worst, shares[worst]) if worst != best else None)
+
+
+def user_choices(request) -> dict:
+    """What the shopper asked for, as a small dict for the LLM (empty choices are left out).
+    `request` is a RecommendationRequest (or anything with the same attributes)."""
+    excluded = [x.strip().lower() for x in (request.excluded_ingredients or [])]
+    choices = {
+        "goals": list(request.goals or []),
+        "category": request.category,
+        "subcategory": request.subcategory,
+        "min_price_usd": request.min_price,
+        "max_price_usd": request.max_price,
+        "fragrance_free": any(x in ("fragrance", "parfum") for x in excluded),
+        "excluded_ingredients": [x for x in excluded if x not in ("fragrance", "parfum")],
+        "required_ingredients": list(request.required_ingredients or []),
+    }
+    return {k: v for k, v in choices.items() if v not in (None, [], False)}
 
 
 def _num(x):
@@ -129,7 +152,7 @@ def _parse_reply(content) -> dict[str, str]:
     return {str(k): v.strip() for k, v in data.items() if isinstance(v, str) and v.strip()}
 
 
-def _ask_llm(results, goals, timeout, client) -> dict[str, str]:
+def _ask_llm(results, goals, timeout, client, choices=None) -> dict[str, str]:
     """One batched OpenRouter call. May raise; explain_results() catches it."""
     body = {
         "model": os.getenv("OPENROUTER_MODEL", "").strip() or DEFAULT_MODEL,
@@ -142,7 +165,13 @@ def _ask_llm(results, goals, timeout, client) -> dict[str, str]:
             {"role": "system", "content": RULES},
             {
                 "role": "user",
-                "content": json.dumps({"requested_goals": goals, "products": [_facts(r) for r in results]}),
+                "content": json.dumps(
+                    {
+                        "requested_goals": goals,
+                        "user_choices": choices or {"goals": goals},
+                        "products": [_facts(r) for r in results],
+                    }
+                ),
             },
         ],
     }
@@ -155,16 +184,18 @@ def _ask_llm(results, goals, timeout, client) -> dict[str, str]:
     return _parse_reply(resp.json()["choices"][0]["message"]["content"])
 
 
-def explain_results(results, goals: list[str], timeout: float = 30.0, client=None) -> dict[str, str]:
+def explain_results(results, goals: list[str], timeout: float = 30.0, client=None, choices=None) -> dict[str, str]:
     """Return {product_id: explanation} for EVERY result. Never raises.
 
     `client` is an optional httpx.Client (tests pass one with a fake transport).
+    `choices` is the shopper's request as a dict (see user_choices); it lets the model say
+    how a product fits the budget, category and so on.
     """
     fallback = {r.product_id: template_summary(r, goals) for r in results}
     if not results or not llm_enabled():
         return fallback
     try:
-        texts = _ask_llm(results, goals, timeout, client)
+        texts = _ask_llm(results, goals, timeout, client, choices)
     except Exception as e:  # never crash the API because of the LLM
         log.warning("LLM explanation failed (%s); using templates", type(e).__name__)
         return fallback
