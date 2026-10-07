@@ -651,3 +651,851 @@ WHERE category = 'Skincare'
 ---
 
 **[File continues with sections 8-13... I'll add them in the next append]**
+
+### Q7.3: How does the API handle errors?
+
+**Answer:**
+
+**Custom exception handler (`@app.exception_handler`):**
+
+**1. Database down (`psycopg.OperationalError`):**
+- Returns HTTP 503 Service Unavailable
+- Message: "Database not reachable"
+- Connection timeout: 5 seconds (set in `os.environ`)
+
+**2. Product not found:**
+- Returns HTTP 404
+- `raise HTTPException(status_code=404, detail="Product not found")`
+
+**3. Invalid input (unknown goal, negative price):**
+- FastAPI auto-validates with Pydantic
+- Returns HTTP 422 Unprocessable Entity
+- Detailed error: `{"detail": "Unknown goal: xyz"}`
+
+**4. LLM failure:**
+- Silent fallback to template text
+- `llm_used: false` in response
+- Logged as warning (not error)
+
+**5. Timeout:**
+- Vector index build at startup timeout: 30s
+- Query timeout (Postgres): controlled by `statement_timeout`
+
+**Design principle:** Degrade gracefully (template text) instead of failing hard
+
+### Q7.4: Why FastAPI over Flask or Django?
+
+**Answer:**
+
+| Feature | FastAPI | Flask | Django |
+|---|---|---|---|
+| **Type checking** | Built-in (Pydantic) | Manual | ORM-based |
+| **Async support** | Native | Via extensions | Native in 3.1+ |
+| **Auto docs** | Swagger + ReDoc | Manual | Manual |
+| **Performance** | Very fast (ASGI) | Slower (WSGI) | Slower |
+| **Learning curve** | Medium | Easy | Steeper |
+| **Use case** | APIs | Websites + APIs | Full web apps |
+
+**Why FastAPI:**
+1. Auto-generated `/docs` (saved time)
+2. Type hints catch bugs early
+3. Fast enough for our use case
+4. Modern Python (3.11+ features)
+
+**Why not Django:** Too heavy (we don't need admin panel, user auth, templating)
+
+---
+
+## 8. FRONTEND IMPLEMENTATION
+
+### Q8.1: Describe the frontend architecture
+
+**Answer:**
+
+**Stack:**
+- **React 19:** UI components
+- **TanStack Start:** SSR + routing + data fetching
+- **TanStack Router:** Type-safe routing
+- **TanStack Query:** API call caching + loading states
+- **Tailwind CSS v4:** Styling
+- **shadcn/ui:** Pre-built components (buttons, dialogs, cards)
+- **Vite:** Build tool
+
+**Structure:**
+```
+client/src/
+├── routes/          # Pages (/, /explore, /ingredients, /compare)
+├── components/      # Reusable UI (ProductCard, FilterPanel, ScoreBreakdown)
+├── lib/
+│   ├── api.ts       # API calls (useRecommend, useProduct, ...)
+│   ├── search-form.ts # Form state management
+│   └── utils.ts     # Helpers
+└── styles.css       # Global styles
+```
+
+**Key pattern: Query hooks**
+```typescript
+const rec = useRecommend(requestBody);
+// rec.data, rec.isLoading, rec.error
+```
+- Automatic caching (same request = cached)
+- Loading + error states handled
+
+### Q8.2: How does the frontend communicate with the backend?
+
+**Answer:**
+
+**Single source: `client/src/lib/api.ts`**
+
+**Example:**
+```typescript
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(API_URL + path, init);
+  if (!res.ok) {
+    // Parse error message from API
+    throw new ApiError(detail, res.status);
+  }
+  return await res.json();
+}
+
+export const useRecommend = (body: RecommendBody | null) =>
+  useQuery({
+    queryKey: ["recommend", body],
+    queryFn: () => request<RecommendResponse>("/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }),
+    enabled: body !== null,  // Only fetch when body is ready
+  });
+```
+
+**Benefits:**
+1. One place to change API_URL
+2. Type safety (TypeScript interfaces match API schemas)
+3. Automatic retry + caching via TanStack Query
+4. Loading/error states handled by query hooks
+
+**CORS handling:**
+- API allows `localhost:*` origins (dev mode)
+- Production would use real domain
+
+### Q8.3: Walk through the Explore page (search interface)
+
+**Answer:**
+
+**User flow:**
+
+1. **Page loads (`/explore`):**
+   - Fetch goals from `/goals` → populate "Goals" buttons
+   - Fetch categories from `/categories` → populate "Category" buttons
+   - Form initialized empty (or from preset link)
+
+2. **User fills form:**
+   - Clicks goals (can select multiple)
+   - Clicks category (mutually exclusive)
+   - Adjusts price slider
+   - Checks "fragrance-free"
+   - Types required/excluded ingredients
+
+3. **User clicks "Find products":**
+   - Form state → `RecommendBody` object
+   - Set `submitted = body`
+   - Triggers `useRecommend(body)` query
+   - Loading state: "Ranking products…"
+
+4. **Results arrive:**
+   - Grid of `ProductCard` components
+   - Each card shows: image, name, brand, price, rating
+   - Score breakdown below card
+   - "Why this product?" button
+
+5. **User clicks "Why this product?":**
+   - Opens `ExplanationPanel` dialog
+   - Shows full score breakdown (6 signals)
+   - Lists matched ingredients
+   - Review aspects
+   - LLM summary
+
+**Code structure:**
+```typescript
+function Explore() {
+  const [form, setForm] = useState<SearchForm>(emptyForm);
+  const [submitted, setSubmitted] = useState<RecommendBody | null>(null);
+  
+  const rec = useRecommend(submitted);
+  
+  return (
+    <FilterPanel form={form} onChange={setForm} onSubmit={() => setSubmitted(toBody(form))} />
+    {rec.isLoading && <div>Ranking products...</div>}
+    {rec.data && <ProductGrid results={rec.data.results} />}
+  );
+}
+```
+
+### Q8.4: How do you handle loading and error states?
+
+**Answer:**
+
+**TanStack Query provides:**
+- `isLoading`: First load
+- `isFetching`: Any load (including refetch)
+- `error`: Exception from fetch
+
+**Patterns:**
+
+**1. Loading placeholder:**
+```typescript
+{rec.isFetching && !rec.data ? (
+  <div className="border border-dashed">
+    <p>Ranking products…</p>
+  </div>
+) : ...}
+```
+
+**2. Error notice component:**
+```typescript
+<ErrorNotice error={rec.error} />
+```
+Shows user-friendly message: "Could not connect to API" or API error detail
+
+**3. Optimistic rendering:**
+- Keep previous results while refetching
+- Show "updating…" indicator
+- Uses `placeholderData: keepPreviousData` in query config
+
+**4. Empty state:**
+```typescript
+{!data ? (
+  <div>Nothing searched yet. Choose a goal and press Find products.</div>
+) : null}
+```
+
+---
+
+## 9. TESTING & EVALUATION
+
+### Q9.1: What testing strategies did you use?
+
+**Answer:**
+
+**1. Unit tests (pytest, 126 tests):**
+- `tests/test_scorer.py`: Score calculation formulas
+- `tests/test_sentiment.py`: VADER sentiment edge cases
+- `tests/test_vectors.py`: Cosine similarity math
+- `tests/test_filters.py`: Ingredient exclusion logic
+
+**Example:**
+```python
+def test_goal_match_score():
+    assert goal_match_score(0) == 0.0
+    assert goal_match_score(5) > 0.7
+    assert goal_match_score(10) > 0.9
+```
+
+**2. Integration tests:**
+- `tests/test_api.py`: API endpoints return correct status codes
+- `tests/test_repository.py`: Database queries return expected data
+
+**3. Quality tests (`test_recommender_quality.py`):**
+- Run 15 diverse requests
+- Check: no budget violations, excluded ingredients absent, results sorted
+
+**4. Evaluation script (`scripts/evaluate_recommender.py`):**
+- 279 different requests
+- Type precision, ingredient evidence
+- Baseline comparisons
+- Results documented in `docs/EVALUATION.md`
+
+**Coverage:** ~85% (core logic covered, some UI untested)
+
+### Q9.2: What did the evaluation reveal?
+
+**Answer:**
+
+**Key findings:**
+
+**1. Hard checks: 0 violations**
+- Every product met filters (price, category, ingredients)
+- Scores between 0-1, correctly sorted
+- Same input → same output (deterministic)
+
+**2. Type precision: 94% (no category), 100% (with category)**
+- Top-10 products were correct type (Moisturizers for hydration)
+- Baseline (random): 15%, (popularity): 12%
+- **Proof hybrid works better than simple sorting**
+
+**3. Problem found: Review bias**
+- Products with reviews got +0.07 score boost vs. no-review products
+- **Fixed:** Use neutral score (0.84) when missing
+- After fix: No-review products ranked fairly
+
+**4. Problem found: Gift sets ranked too high**
+- 249-ingredient kits beat focused serums (counted raw matches)
+- **Fixed:** Exponential decay + intent score (gift sets = 0.25)
+
+**5. Limitation: Only Skincare has reviews**
+- 2,351 of 8,494 products have sentiment signals
+- Hair, Makeup rely only on ingredients + rating
+
+**Honest takeaway:** System works for intended use (Skincare with goals), has documented limits
+
+### Q9.3: Why didn't you use human ratings for evaluation?
+
+**Answer:**
+
+**Reasons:**
+
+**1. Resource constraints:**
+- Labeling 100+ products × 11 goals = 1100+ judgments
+- Need multiple raters for reliability
+- Time-intensive (weeks)
+
+**2. Subjectivity:**
+- Beauty preferences vary by skin type, budget, brand loyalty
+- What's "best" for hydration is not objective
+
+**3. Cold start problem:**
+- Need labeled data to evaluate, but no usage data yet
+
+**Alternative we used:**
+- **Type precision:** Objective (is it a Moisturizer?)
+- **Ingredient evidence:** Fact-based (does it contain glycerin?)
+- **Baseline comparison:** Prove we're better than random/popularity
+
+**Future work:** A/B testing with real users, clickthrough rate analysis
+
+---
+
+## 10. DEPLOYMENT & DEVOPS
+
+### Q10.1: How would you deploy this to production?
+
+**Answer:**
+
+**Proposed architecture:**
+
+```
+┌────────────────┐
+│  Cloudflare    │  CDN + DNS
+│  or Vercel     │
+└────────┬───────┘
+         │
+         ▼
+┌────────────────┐
+│  Frontend      │  Vercel (SSR) or Netlify (static)
+│  (React app)   │
+└────────┬───────┘
+         │ HTTPS
+         ▼
+┌────────────────┐
+│  API Server    │  DigitalOcean Droplet / AWS EC2 / Render.com
+│  (FastAPI)     │  Dockerized with Gunicorn/Uvicorn
+└────────┬───────┘
+         │
+         ▼
+┌────────────────┐
+│  PostgreSQL    │  Managed DB (AWS RDS, DigitalOcean Managed DB)
+│  (Production)  │  Automated backups, read replicas
+└────────────────┘
+```
+
+**Steps:**
+
+**1. Database:**
+- Use managed PostgreSQL (AWS RDS, DigitalOcean)
+- Import dump: `pg_restore ingredientiq_full.dump`
+- Enable SSL, firewall rules (only API IP)
+
+**2. Backend API:**
+```dockerfile
+FROM python:3.11-slim
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY src/ /app/src/
+CMD ["gunicorn", "src.api.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker"]
+```
+- Deploy to Render.com (free tier) or AWS ECS
+- Set environment variables (PGHOST, OPENROUTER_API_KEY)
+- Health checks: `/health` endpoint
+
+**3. Frontend:**
+- Build: `npm run build` → static files in `dist/`
+- Deploy to Vercel: `vercel --prod`
+- Set `VITE_API_URL=https://api.ingredientiq.com`
+
+**4. CI/CD:**
+```yaml
+# .github/workflows/deploy.yml
+on: push
+  branches: [main]
+jobs:
+  test:
+    run: pytest
+  deploy-api:
+    run: docker build && docker push
+  deploy-frontend:
+    run: vercel deploy --prod
+```
+
+### Q10.2: What environment variables are needed?
+
+**Answer:**
+
+**Backend (`.env`):**
+```
+PGHOST=db.ingredientiq.com
+PGPORT=5432
+PGDATABASE=ingredientiq
+PGUSER=prod_user
+PGPASSWORD=<secret>
+OPENROUTER_API_KEY=sk-or-v1-<secret>
+OPENROUTER_MODEL=google/gemini-2.5-flash-lite
+```
+
+**Frontend:**
+```
+VITE_API_URL=https://api.ingredientiq.com
+```
+
+**Security:**
+- Never commit `.env` to Git (in `.gitignore`)
+- Use secrets manager (AWS Secrets Manager, Vercel Env Vars)
+- Rotate API keys regularly
+
+### Q10.3: How do you handle database backups?
+
+**Answer:**
+
+**Development:**
+```powershell
+.\scripts\export_db.ps1
+```
+Creates `ingredientiq_full.dump` with timestamp
+
+**Production:**
+
+**1. Automated daily backups:**
+- Managed DB providers (AWS RDS, DigitalOcean) do this automatically
+- Retention: 7 days
+
+**2. Manual backup before migrations:**
+```bash
+pg_dump -h prod.db.com -U user -d ingredientiq > backup_$(date +%Y%m%d).dump
+```
+
+**3. Disaster recovery:**
+- Keep dumps in S3 / cloud storage
+- Test restore procedure quarterly
+- Document recovery steps
+
+### Q10.4: What monitoring would you implement?
+
+**Answer:**
+
+**1. Uptime monitoring:**
+- Pingdom / UptimeRobot hitting `/health` every 5 min
+- Alert on downtime
+
+**2. Error tracking:**
+- Sentry for backend (catches exceptions)
+- Frontend errors logged to Sentry
+
+**3. Logging:**
+```python
+import logging
+log = logging.getLogger("ingredientiq.api")
+log.info("Request: %s", request)
+log.error("Database error: %s", exc)
+```
+- Ship logs to Papertrail / CloudWatch
+
+**4. Metrics:**
+- Request latency (p50, p95, p99)
+- Database query time
+- LLM API success rate
+- Cache hit rate
+
+**5. Alerts:**
+- Email/Slack on:
+  - API response time > 2s
+  - Error rate > 1%
+  - Database connection failures
+
+---
+
+## 11. CHALLENGES & SOLUTIONS
+
+### Q11.1: What was the biggest challenge you faced?
+
+**Answer:**
+
+**Challenge: Review bias favoring Skincare**
+
+**Problem discovered:**
+- Only Skincare has reviews (2,351 products)
+- Review scores all high (0.61-0.95, avg 0.84)
+- Dropping review weight for no-review products gave them unfair advantage
+- Result: Body creams, hair products ranked far lower than deserved
+
+**Solution:**
+1. Use `NEUTRAL_REVIEW_SCORE = 0.84` when missing
+2. Still show `review_score: null` in API (honest)
+3. Re-ran evaluation: no-review products recovered fair ranks
+
+**Lesson:** Missing data ≠ neutral; need careful handling
+
+### Q11.2: What technical issues did you encounter during setup?
+
+**Answer:**
+
+**Issue 1: Port conflict (PostgreSQL)**
+- **Problem:** Local Postgres on 5432, Docker container on 5432
+- **Symptom:** Connection refused / password errors
+- **Solution:** Changed Docker to 5433, updated `.env`
+
+**Issue 2: Review NLP script timeout**
+- **Problem:** 1M reviews, VADER per review = 12 minutes
+- **First attempt:** Loaded all into memory (RAM overflow)
+- **Solution:** Server-side cursor (`psycopg named cursor`) streams batches of 5000
+
+**Issue 3: OpenRouter 402 error**
+- **Problem:** No `max_tokens` limit, OpenRouter refused large batches
+- **Solution:** Added `max_tokens=800` per product summary
+
+**Issue 4: Frontend hydration error**
+- **Problem:** Server rendered "—", client fetched "8,494" (mismatch)
+- **Solution:** Cosmetic, doesn't break functionality; added note in docs
+
+### Q11.3: How did you handle the cold start problem (vector index)?
+
+**Answer:**
+
+**Problem:**
+- Vector index = 8,494 products × 126 features = ~1M numbers
+- Loading from DB + building index = 600ms
+- Don't want to do this per request (slow)
+
+**Solution:**
+
+**1. Build once at API startup:**
+```python
+@asynccontextmanager
+async def lifespan(app):
+    global _index
+    repo = ProductRepository()
+    _index = VectorIndex.from_db(repo.connection)  # ~0.6s
+    yield  # API is now ready
+```
+
+**2. Share across all requests:**
+- Index stored in RAM (global variable)
+- Read-only (never modified)
+- No locking needed
+
+**3. Fallback if DB down:**
+- API starts anyway
+- Index built on first request that needs it
+
+**Trade-off:** 0.6s startup delay, but 0ms per request afterward
+
+---
+
+## 12. FUTURE ENHANCEMENTS
+
+### Q12.1: What features would you add next?
+
+**Answer:**
+
+**High priority:**
+
+**1. Natural language search**
+- Input: "lightweight hydrating serum under $50 no fragrance"
+- LLM parses → structured query → recommendation
+- Better UX than clicking 10 buttons
+
+**2. User accounts & saved searches**
+- Save preferences (skin type, budget, excluded ingredients)
+- "My Products" list
+- History of searches
+
+**3. Comparison tool enhancements**
+- Side-by-side ingredient overlap visualization
+- "What's different?" explanation
+- Export comparison as PDF
+
+**Medium priority:**
+
+**4. Mobile app (React Native)**
+- Barcode scanner (scan product → ingredient check)
+- Push notifications for price drops
+
+**5. Ingredient trend analysis**
+- "Rising ingredients in 2025"
+- "Most common in 5-star products"
+
+**6. Batch ingredient lookup**
+- Paste full ingredient list → get analysis
+- Useful for checking products not in our catalog
+
+**Low priority:**
+
+**7. Collaborative filtering**
+- "Users who liked this also liked..."
+- Requires user interaction data
+
+**8. Multi-language support**
+- Ingredient names in Spanish, French, etc.
+
+### Q12.2: How would you improve the recommendation algorithm?
+
+**Answer:**
+
+**1. Learn weights from data:**
+- Collect clickthrough data (which products users actually click)
+- Use learning-to-rank model (RankNet, LambdaMART)
+- Optimize weights to match user preferences
+
+**2. Personalization:**
+- Skin type-specific recommendations
+- "You tend to prefer fragrance-free" → auto-check that box
+- Past purchase history
+
+**3. Expand ingredient knowledge:**
+- Currently 705/12,512 ingredients (6%)
+- Use LLM to classify unknowns (with human verification)
+- Crowdsource: let users tag ingredients
+
+**4. Better review aspect extraction:**
+- Fine-tune BERT on beauty reviews
+- More granular aspects ("pilling", "grittiness")
+- Temporal trends ("used to be good, reformulated")
+
+**5. Price-aware ranking:**
+- $/oz normalization (50ml vs 100ml)
+- "Best value" score separate from "best quality"
+
+**6. Combination effects:**
+- Some ingredients work better together (niacinamide + zinc)
+- Some conflict (vitamin C + retinol timing)
+- Requires expert curation
+
+### Q12.3: What scalability concerns would you address?
+
+**Answer:**
+
+**Current limits:**
+- 8,494 products (small dataset)
+- Vector index fits in RAM (~10 MB)
+- Single API server handles 100+ req/sec
+
+**If scaling to 100K+ products:**
+
+**1. Database optimization:**
+- Index on `(category, price)` for faster filters
+- Materialized view for pre-aggregated stats
+- Read replicas for heavy queries
+
+**2. Caching:**
+```python
+@lru_cache(maxsize=1000)
+def recommend(request_hash):
+    ...
+```
+- Cache top-10 for common queries (hydration + Skincare)
+- Redis for distributed cache
+
+**3. Async scoring:**
+- Score products in parallel (multiprocessing)
+- Currently sequential (0.2s for 8K products, acceptable)
+
+**4. Vector database:**
+- Switch to Pinecone / Weaviate for similarity search
+- Sub-millisecond retrieval for 1M+ vectors
+
+**5. CDN for static data:**
+- Cache `/goals`, `/categories` at edge
+
+---
+
+## 13. ETHICAL & PRACTICAL CONSIDERATIONS
+
+### Q13.1: What are the ethical considerations of your project?
+
+**Answer:**
+
+**1. Not medical advice:**
+- Explicitly state "non-medical, not for diagnosis"
+- Cannot claim products "cure" conditions
+- Refer users to dermatologists for medical concerns
+
+**2. Data source transparency:**
+- Clearly state "Sephora data" (not hiding it)
+- No personal customer data (reviews anonymized)
+
+**3. Bias acknowledgment:**
+- System favors Skincare (has reviews)
+- Limited ingredient knowledge (705/12,512)
+- Documented in `docs/EVALUATION.md`
+
+**4. LLM hallucination prevention:**
+- LLM only describes pre-selected products
+- Cannot invent products or ingredients
+- Fallback to templates if LLM fails
+
+**5. Accessibility:**
+- Not claiming "allergen-free" (only "no fragrance listed")
+- Users responsible for checking full lists
+
+### Q13.2: What are the limitations users should know?
+
+**Answer:**
+
+**Clear disclosures:**
+
+**1. Data coverage:**
+- Only Sephora catalog (no Ulta, drugstore brands)
+- 2023 data (products/prices may change)
+- Reviews only for Skincare
+
+**2. Ingredient knowledge:**
+- 705 of 12,512 ingredients classified
+- Weak for some goals (brightening: 4 ingredients)
+
+**3. Not personalized:**
+- Doesn't account for skin type reactions
+- Same results for everyone with same inputs
+
+**4. Placeholders:**
+- Product images are placeholders (dataset has none)
+- Doesn't show real product photos
+
+**5. Sentiment limitations:**
+- VADER misses sarcasm
+- Aspect scores rough (keyword-based)
+
+**Principle:** Honest about what the system can and can't do
+
+### Q13.3: How do you ensure result explainability?
+
+**Answer:**
+
+**Every result shows:**
+
+**1. Complete score breakdown:**
+- 6 signals with individual values
+- Weights used (30%, 20%, ...)
+- Formula transparent
+
+**2. Matched ingredients listed:**
+- Shows which specific ingredients matched the goal
+- Not just "high score"
+
+**3. Review aspects:**
+- "487 mentions of hydration, 62% positive"
+- Specific, countable
+
+**4. Strengths/weaknesses:**
+- Rule-based sentences ("Highly rated at 4.5/5")
+- Derived from scores, not opinions
+
+**5. Source traceability:**
+- Can click through to full ingredient list
+- Review signals table queryable
+
+**Why it matters:**
+- Users can verify claims
+- Builds trust
+- Catches errors (if score seems wrong, can debug)
+
+### Q13.4: What data privacy measures are in place?
+
+**Answer:**
+
+**Current (development):**
+- No user accounts → no personal data collected
+- API doesn't log IP addresses
+- OpenRouter API key in `.env` (not in code)
+
+**If deployed with user accounts:**
+
+**1. Data minimization:**
+- Only collect: email, hashed password
+- No phone numbers, addresses
+
+**2. Encryption:**
+- HTTPS for all traffic
+- Database credentials encrypted at rest
+
+**3. API key security:**
+- Rotate OpenRouter key quarterly
+- Use secrets manager (not `.env` in production)
+
+**4. No tracking:**
+- No Google Analytics (respects privacy)
+- Minimal cookies (session only)
+
+**5. Compliance:**
+- GDPR: Right to deletion (if user accounts added)
+- Display privacy policy
+
+---
+
+## QUICK FACTS FOR VIVA
+
+**Statistics:**
+- **8,494** products in catalog
+- **1,093,895** reviews analyzed
+- **2,351** products with sentiment signals
+- **12,512** unique ingredients
+- **705** ingredients with curated knowledge
+- **126** tests passing
+- **279** evaluation requests (0 violations)
+- **94%** type precision (vs 15% random)
+
+**Time investments:**
+- Review NLP: ~12 minutes for 1M reviews
+- API startup: ~0.6s (vector index)
+- Recommendation: 200-500ms without LLM, ~2s with LLM
+
+**Tech stack:**
+- **Backend:** Python 3.11, FastAPI, psycopg3, NumPy, VADER
+- **Database:** PostgreSQL 18 (Docker)
+- **Frontend:** React 19, TanStack, Tailwind v4, TypeScript
+- **LLM:** OpenRouter (Gemini 2.5 Flash Lite)
+- **Deployment:** Docker Compose (dev), proposed Vercel + Render (prod)
+
+**Key files to know:**
+- `src/recommender/engine.py` - Main recommendation logic
+- `src/reviews/sentiment.py` - VADER sentiment analysis
+- `src/recommender/vectors.py` - Cosine similarity
+- `src/api/main.py` - API endpoints
+- `client/src/lib/api.ts` - Frontend ↔ Backend communication
+
+---
+
+## SAMPLE VIVA QUESTIONS WITH ANSWERS
+
+**Q: Walk me through what happens when a user searches for "hydrating moisturizer under $50"**
+
+A: 1) Frontend sends POST to `/recommend` with `{goals: ["hydration"], category: "Skincare", max_price: 50}`. 2) API queries Postgres for Skincare products ≤$50. 3) For each product, computes 6 scores (goal match, similarity, intent, review, rating, popularity) using ingredient data, functional profiles, and review signals. 4) Weighted average: 0.30 × goal + 0.20 × similarity + 0.15 × intent + 0.15 × review + 0.12 × rating + 0.08 × popularity. 5) Sorts by score, takes top 10. 6) Sends facts to OpenRouter LLM to write 2-3 sentence summaries. 7) Returns JSON with products, scores, matched ingredients, and explanations. Frontend displays results with score breakdowns.
+
+**Q: Why didn't you use deep learning?**
+
+A: Trade-off between complexity and explainability. Deep learning (transformers, neural networks) would be a black box - users can't see why a product scored 0.85. Our hybrid approach uses interpretable math (cosine similarity, weighted averages, exponential decay). Every score traces back to countable facts (5 matching ingredients, 0.70 similarity, 4.5/5 rating). For a consumer-facing app, trust requires transparency. Plus, our dataset is small (8K products) - deep learning needs 100K+ for good performance. Rule-based + VADER achieves 94% type precision, which is good enough.
+
+**Q: What if the LLM hallucinates a product?**
+
+A: It can't. The LLM never chooses products - that's done by deterministic code (SQL filters + scoring formula). LLM only receives pre-selected products with their facts (name, brand, 8 matched ingredients, scores). Prompt explicitly says "use only the provided facts, mention only ingredients from matched_ingredients list". If LLM fails (timeout, API down), we silently use template text instead ("Strong goal match. Highly rated."). The `llm_used: false` flag tells the user it's a fallback. Design principle: degrade gracefully, never break.
+
+---
+
+**Ready for your viva! Know these docs inside-out:**
+1. `docs/WHAT_WAS_BUILT.md` - High-level overview
+2. `docs/EVALUATION.md` - Results and limitations
+3. `docs/API.md` - Endpoint reference
+4. `src/recommender/config.py` - All tunable parameters
+
+**Good luck! 🎓**
