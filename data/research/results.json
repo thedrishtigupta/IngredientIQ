@@ -1,0 +1,3668 @@
+{
+  "state": "ready",
+  "generatedOn": "2026-10-25",
+  "dataset": {
+    "catalogue_products": 8494,
+    "no_ingredients": 950,
+    "multi_component_kits": 713,
+    "in_scope_before_dedup": 6320,
+    "analysis_products": 5547,
+    "targetsAvailable": {
+      "rating": 4617,
+      "log_loves": 5547,
+      "log_reviews": 5547,
+      "rec_rate": 1529,
+      "high_performer": 5547
+    },
+    "categories": {
+      "Skincare": 1836,
+      "Makeup": 1563,
+      "Hair": 1018,
+      "Fragrance": 748,
+      "Bath & Body": 328,
+      "Men": 54
+    },
+    "ingredientFeatures": 572,
+    "combinations": 134
+  },
+  "prespecified": [
+    {
+      "label": "glycerin + sodium hyaluronate",
+      "scope": "All",
+      "target": "rating",
+      "effect": -0.0065,
+      "adjustedP": 0.933,
+      "rawP": 0.9119
+    },
+    {
+      "label": "glycerin + hyaluronic acid",
+      "scope": "All",
+      "target": "rating",
+      "effect": 0.0545,
+      "adjustedP": 0.8467,
+      "rawP": 0.4588
+    },
+    {
+      "label": "glycerin + sodium hyaluronate",
+      "scope": "All",
+      "target": "log_loves",
+      "effect": -0.1057,
+      "adjustedP": 0.0152,
+      "rawP": 0.0333
+    },
+    {
+      "label": "glycerin + hyaluronic acid",
+      "scope": "All",
+      "target": "log_loves",
+      "effect": -0.1176,
+      "adjustedP": 0.3543,
+      "rawP": 0.3766
+    },
+    {
+      "label": "glycerin + sodium hyaluronate",
+      "scope": "All",
+      "target": "log_reviews",
+      "effect": -0.0663,
+      "adjustedP": 0.2946,
+      "rawP": 0.1429
+    },
+    {
+      "label": "glycerin + hyaluronic acid",
+      "scope": "All",
+      "target": "log_reviews",
+      "effect": -0.0776,
+      "adjustedP": 0.6773,
+      "rawP": 0.8946
+    },
+    {
+      "label": "glycerin + sodium hyaluronate",
+      "scope": "All",
+      "target": "rec_rate",
+      "effect": -0.0446,
+      "adjustedP": 0.7399,
+      "rawP": 0.8659
+    },
+    {
+      "label": "glycerin + hyaluronic acid",
+      "scope": "All",
+      "target": "rec_rate",
+      "effect": 0.0962,
+      "adjustedP": 0.7399,
+      "rawP": 0.1624
+    },
+    {
+      "label": "glycerin + sodium hyaluronate",
+      "scope": "All",
+      "target": "high_performer",
+      "effect": 0.0217,
+      "adjustedP": 0.8616,
+      "rawP": 0.4309
+    },
+    {
+      "label": "glycerin + hyaluronic acid",
+      "scope": "All",
+      "target": "high_performer",
+      "effect": 0.1951,
+      "adjustedP": 0.527,
+      "rawP": 0.0368
+    },
+    {
+      "label": "glycerin + sodium hyaluronate",
+      "scope": "Skincare",
+      "target": "rating",
+      "effect": -0.0742,
+      "adjustedP": 0.5447,
+      "rawP": 0.4402
+    },
+    {
+      "label": "glycerin + hyaluronic acid",
+      "scope": "Skincare",
+      "target": "rating",
+      "effect": 0.0653,
+      "adjustedP": 0.8987,
+      "rawP": 0.4393
+    },
+    {
+      "label": "glycerin + sodium hyaluronate",
+      "scope": "Skincare",
+      "target": "log_loves",
+      "effect": -0.1367,
+      "adjustedP": 0.0743,
+      "rawP": 0.0026
+    },
+    {
+      "label": "glycerin + hyaluronic acid",
+      "scope": "Skincare",
+      "target": "log_loves",
+      "effect": -0.0745,
+      "adjustedP": 0.839,
+      "rawP": 0.2794
+    },
+    {
+      "label": "glycerin + sodium hyaluronate",
+      "scope": "Skincare",
+      "target": "log_reviews",
+      "effect": -0.0913,
+      "adjustedP": 0.3931,
+      "rawP": 0.3166
+    },
+    {
+      "label": "glycerin + hyaluronic acid",
+      "scope": "Skincare",
+      "target": "log_reviews",
+      "effect": -0.071,
+      "adjustedP": 0.8338,
+      "rawP": 0.6895
+    },
+    {
+      "label": "glycerin + sodium hyaluronate",
+      "scope": "Skincare",
+      "target": "rec_rate",
+      "effect": -0.0446,
+      "adjustedP": 0.7399,
+      "rawP": 0.8659
+    },
+    {
+      "label": "glycerin + hyaluronic acid",
+      "scope": "Skincare",
+      "target": "rec_rate",
+      "effect": 0.0962,
+      "adjustedP": 0.7399,
+      "rawP": 0.1624
+    },
+    {
+      "label": "glycerin + sodium hyaluronate",
+      "scope": "Skincare",
+      "target": "high_performer",
+      "effect": -0.0215,
+      "adjustedP": 0.9559,
+      "rawP": 0.977
+    },
+    {
+      "label": "glycerin + hyaluronic acid",
+      "scope": "Skincare",
+      "target": "high_performer",
+      "effect": 0.3361,
+      "adjustedP": 0.21,
+      "rawP": 0.0029
+    }
+  ],
+  "untestable": [
+    "niacinamide + zinc pca"
+  ],
+  "scopes": {
+    "All": {
+      "rating": {
+        "label": "Average rating",
+        "task": "regression",
+        "n": 4617,
+        "modelComparison": [
+          {
+            "metric": "R²",
+            "modelA": 0.2415,
+            "modelB": 0.2496,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "MAE",
+            "modelA": 0.2453,
+            "modelB": 0.2438,
+            "higherIsBetter": false
+          },
+          {
+            "metric": "RMSE",
+            "modelA": 0.3288,
+            "modelB": 0.327,
+            "higherIsBetter": false
+          }
+        ],
+        "comparisons": [
+          {
+            "model": "Ridge",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.2441,
+            "b": 0.1285,
+            "gain": -0.1156,
+            "pCorrected": 0.0002,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.2495,
+            "b": 0.2296,
+            "gain": -0.0198,
+            "pCorrected": 0.0307,
+            "bWins": 1,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.2415,
+            "b": 0.2496,
+            "gain": 0.0081,
+            "pCorrected": 0.5403,
+            "bWins": 10,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Ridge",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1037,
+            "b": -0.0479,
+            "gain": -0.1516,
+            "pCorrected": 0.0263,
+            "bWins": 0,
+            "folds": 5,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1442,
+            "b": 0.1426,
+            "gain": -0.0016,
+            "pCorrected": 0.9181,
+            "bWins": 3,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1146,
+            "b": 0.1406,
+            "gain": 0.026,
+            "pCorrected": 0.0848,
+            "bWins": 4,
+            "folds": 5,
+            "verdict": "no significant difference"
+          }
+        ],
+        "tests": {
+          "total": 434,
+          "significantRaw": 197,
+          "significantAdjusted": 21,
+          "robust": 16
+        },
+        "associations": [
+          {
+            "label": "vp/eicosene copolymer",
+            "kind": "ingredient",
+            "effect": -0.4066,
+            "rawEffect": -0.4712,
+            "adjustedP": 0.019,
+            "nWith": 76
+          },
+          {
+            "label": "vp/va copolymer",
+            "kind": "ingredient",
+            "effect": -0.3641,
+            "rawEffect": -0.2913,
+            "adjustedP": 0.0326,
+            "nWith": 75
+          },
+          {
+            "label": "leuconostoc/radish root ferment filtrate",
+            "kind": "ingredient",
+            "effect": 0.3023,
+            "rawEffect": 0.1246,
+            "adjustedP": 0.0049,
+            "nWith": 211
+          },
+          {
+            "label": "methyl methacrylate crosspolymer",
+            "kind": "ingredient",
+            "effect": -0.3001,
+            "rawEffect": -0.2471,
+            "adjustedP": 0.0478,
+            "nWith": 91
+          },
+          {
+            "label": "behentrimonium chloride + cetearyl alcohol",
+            "kind": "combination",
+            "effect": 0.2419,
+            "rawEffect": 0.2846,
+            "adjustedP": 0.0478,
+            "nWith": 163
+          },
+          {
+            "label": "behentrimonium chloride",
+            "kind": "ingredient",
+            "effect": 0.2343,
+            "rawEffect": 0.2579,
+            "adjustedP": 0.0419,
+            "nWith": 196
+          },
+          {
+            "label": "alcohol denat",
+            "kind": "ingredient",
+            "effect": -0.1965,
+            "rawEffect": -0.0854,
+            "adjustedP": 0.0263,
+            "nWith": 485
+          },
+          {
+            "label": "butyrospermum parkii (shea) butter",
+            "kind": "ingredient",
+            "effect": 0.172,
+            "rawEffect": 0.1116,
+            "adjustedP": 0.0338,
+            "nWith": 389
+          },
+          {
+            "label": "butylene glycol + disodium edta",
+            "kind": "combination",
+            "effect": -0.1655,
+            "rawEffect": -0.1125,
+            "adjustedP": 0.0414,
+            "nWith": 458
+          },
+          {
+            "label": "stearic acid",
+            "kind": "ingredient",
+            "effect": -0.1635,
+            "rawEffect": -0.1823,
+            "adjustedP": 0.0419,
+            "nWith": 369
+          },
+          {
+            "label": "squalane",
+            "kind": "ingredient",
+            "effect": 0.1595,
+            "rawEffect": 0.0735,
+            "adjustedP": 0.0263,
+            "nWith": 575
+          },
+          {
+            "label": "2-hexanediol",
+            "kind": "ingredient",
+            "effect": 0.157,
+            "rawEffect": 0.0684,
+            "adjustedP": 0.0419,
+            "nWith": 485
+          },
+          {
+            "label": "tocopherol",
+            "kind": "ingredient",
+            "effect": 0.1302,
+            "rawEffect": 0.0725,
+            "adjustedP": 0.0049,
+            "nWith": 1597
+          },
+          {
+            "label": "butylene glycol + phenoxyethanol",
+            "kind": "combination",
+            "effect": -0.1274,
+            "rawEffect": -0.1126,
+            "adjustedP": 0.0338,
+            "nWith": 981
+          },
+          {
+            "label": "butylene glycol + phenoxyethanol + water",
+            "kind": "combination",
+            "effect": -0.1208,
+            "rawEffect": -0.1124,
+            "adjustedP": 0.0478,
+            "nWith": 839
+          }
+        ],
+        "shap": [
+          {
+            "feature": "log reviews",
+            "meanAbsShap": 0.0643,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "log loves",
+            "meanAbsShap": 0.0424,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "log price",
+            "meanAbsShap": 0.0265,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "secondary category: Eye",
+            "meanAbsShap": 0.0149,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "new",
+            "meanAbsShap": 0.0128,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "share of solvent",
+            "meanAbsShap": 0.0109,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "position: linalool",
+            "meanAbsShap": 0.0091,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of colorant",
+            "meanAbsShap": 0.0083,
+            "direction": "positive",
+            "group": "functional_group"
+          },
+          {
+            "feature": "online only",
+            "meanAbsShap": 0.0081,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "brand: infrequent_sklearn",
+            "meanAbsShap": 0.0081,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.0073,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: tocopheryl acetate",
+            "meanAbsShap": 0.007,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of preservative booster",
+            "meanAbsShap": 0.007,
+            "direction": "positive",
+            "group": "functional_group"
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.0068,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "on sale",
+            "meanAbsShap": 0.0068,
+            "direction": "negative",
+            "group": "baseline"
+          }
+        ],
+        "ingredientShap": [
+          {
+            "feature": "share of solvent",
+            "meanAbsShap": 0.0109,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: linalool",
+            "meanAbsShap": 0.0091,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.7813,
+            "confirmed": false
+          },
+          {
+            "feature": "share of colorant",
+            "meanAbsShap": 0.0083,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.0073,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.4498,
+            "confirmed": false
+          },
+          {
+            "feature": "position: tocopheryl acetate",
+            "meanAbsShap": 0.007,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.5549,
+            "confirmed": false
+          },
+          {
+            "feature": "share of preservative booster",
+            "meanAbsShap": 0.007,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.0068,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.0761,
+            "confirmed": false
+          },
+          {
+            "feature": "share of film former",
+            "meanAbsShap": 0.0067,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of botanical",
+            "meanAbsShap": 0.0065,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: silica",
+            "meanAbsShap": 0.0063,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.1292,
+            "confirmed": false
+          },
+          {
+            "feature": "position: fragrance",
+            "meanAbsShap": 0.0063,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.4498,
+            "confirmed": false
+          },
+          {
+            "feature": "n ingredients",
+            "meanAbsShap": 0.0061,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0058,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.688,
+            "confirmed": false
+          },
+          {
+            "feature": "limonene + linalool",
+            "meanAbsShap": 0.0057,
+            "direction": "positive",
+            "group": "combination",
+            "statsQ": 0.1984,
+            "confirmed": false
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.0056,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          }
+        ],
+        "shapShares": {
+          "baseline": 0.4147,
+          "combination": 0.0489,
+          "functional_group": 0.1514,
+          "ingredient": 0.385
+        }
+      },
+      "log_loves": {
+        "label": "Popularity (log loves)",
+        "task": "regression",
+        "n": 5547,
+        "modelComparison": [
+          {
+            "metric": "R²",
+            "modelA": 0.5245,
+            "modelB": 0.5204,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "MAE",
+            "modelA": 0.8024,
+            "modelB": 0.8002,
+            "higherIsBetter": false
+          },
+          {
+            "metric": "RMSE",
+            "modelA": 1.0781,
+            "modelB": 1.0831,
+            "higherIsBetter": false
+          }
+        ],
+        "comparisons": [
+          {
+            "model": "Ridge",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.4911,
+            "b": 0.4513,
+            "gain": -0.0398,
+            "pCorrected": 0.0108,
+            "bWins": 1,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.5365,
+            "b": 0.4988,
+            "gain": -0.0377,
+            "pCorrected": 0.0,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.5245,
+            "b": 0.5204,
+            "gain": -0.0041,
+            "pCorrected": 0.5094,
+            "bWins": 5,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Ridge",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.2639,
+            "b": 0.1884,
+            "gain": -0.0755,
+            "pCorrected": 0.0316,
+            "bWins": 0,
+            "folds": 5,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.3553,
+            "b": 0.3665,
+            "gain": 0.0112,
+            "pCorrected": 0.1748,
+            "bWins": 4,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.346,
+            "b": 0.3447,
+            "gain": -0.0013,
+            "pCorrected": 0.9007,
+            "bWins": 3,
+            "folds": 5,
+            "verdict": "no significant difference"
+          }
+        ],
+        "tests": {
+          "total": 434,
+          "significantRaw": 286,
+          "significantAdjusted": 53,
+          "robust": 36
+        },
+        "associations": [
+          {
+            "label": "cyclopentasiloxane",
+            "kind": "ingredient",
+            "effect": 0.3943,
+            "rawEffect": 0.2848,
+            "adjustedP": 0.0,
+            "nWith": 301
+          },
+          {
+            "label": "acetyl hexapeptide-8",
+            "kind": "ingredient",
+            "effect": -0.3369,
+            "rawEffect": -0.2218,
+            "adjustedP": 0.0044,
+            "nWith": 101
+          },
+          {
+            "label": "calcium sodium borosilicate",
+            "kind": "ingredient",
+            "effect": 0.307,
+            "rawEffect": 0.4359,
+            "adjustedP": 0.0028,
+            "nWith": 116
+          },
+          {
+            "label": "glycyrrhiza glabra (licorice) root extract",
+            "kind": "ingredient",
+            "effect": 0.2799,
+            "rawEffect": 0.2775,
+            "adjustedP": 0.0104,
+            "nWith": 121
+          },
+          {
+            "label": "cetyl peg/ppg-10/1 dimethicone",
+            "kind": "ingredient",
+            "effect": 0.2794,
+            "rawEffect": 0.4667,
+            "adjustedP": 0.0058,
+            "nWith": 118
+          },
+          {
+            "label": "phytic acid",
+            "kind": "ingredient",
+            "effect": -0.2773,
+            "rawEffect": -0.2432,
+            "adjustedP": 0.0218,
+            "nWith": 88
+          },
+          {
+            "label": "magnesium sulfate",
+            "kind": "ingredient",
+            "effect": 0.2507,
+            "rawEffect": 0.3203,
+            "adjustedP": 0.0135,
+            "nWith": 118
+          },
+          {
+            "label": "lactobacillus ferment",
+            "kind": "ingredient",
+            "effect": -0.2489,
+            "rawEffect": -0.1985,
+            "adjustedP": 0.0152,
+            "nWith": 120
+          },
+          {
+            "label": "sodium citrate",
+            "kind": "ingredient",
+            "effect": -0.2459,
+            "rawEffect": -0.1691,
+            "adjustedP": 0.0,
+            "nWith": 428
+          },
+          {
+            "label": "tetrasodium glutamate diacetate",
+            "kind": "ingredient",
+            "effect": -0.24,
+            "rawEffect": -0.1774,
+            "adjustedP": 0.0257,
+            "nWith": 126
+          },
+          {
+            "label": "calcium aluminum borosilicate",
+            "kind": "ingredient",
+            "effect": 0.2337,
+            "rawEffect": 0.4587,
+            "adjustedP": 0.0343,
+            "nWith": 101
+          },
+          {
+            "label": "dimethicone + disteardimonium hectorite",
+            "kind": "combination",
+            "effect": 0.2299,
+            "rawEffect": 0.3901,
+            "adjustedP": 0.0044,
+            "nWith": 197
+          },
+          {
+            "label": "water\\aqua\\eau",
+            "kind": "ingredient",
+            "effect": -0.2137,
+            "rawEffect": -0.1963,
+            "adjustedP": 0.0344,
+            "nWith": 151
+          },
+          {
+            "label": "peg-40 hydrogenated castor oil",
+            "kind": "ingredient",
+            "effect": -0.1923,
+            "rawEffect": -0.1679,
+            "adjustedP": 0.0082,
+            "nWith": 236
+          },
+          {
+            "label": "aluminum hydroxide",
+            "kind": "ingredient",
+            "effect": 0.1897,
+            "rawEffect": 0.399,
+            "adjustedP": 0.0149,
+            "nWith": 221
+          }
+        ],
+        "shap": [
+          {
+            "feature": "child count",
+            "meanAbsShap": 0.4355,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "online only",
+            "meanAbsShap": 0.2668,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "new",
+            "meanAbsShap": 0.1732,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "log price",
+            "meanAbsShap": 0.1211,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "primary category: Skincare",
+            "meanAbsShap": 0.0984,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "primary category: Makeup",
+            "meanAbsShap": 0.0742,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "sephora exclusive",
+            "meanAbsShap": 0.0617,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "brand: infrequent_sklearn",
+            "meanAbsShap": 0.0537,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "share of colorant",
+            "meanAbsShap": 0.0493,
+            "direction": "positive",
+            "group": "functional_group"
+          },
+          {
+            "feature": "share of texture modifier",
+            "meanAbsShap": 0.0293,
+            "direction": "positive",
+            "group": "functional_group"
+          },
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.0283,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "primary category: Fragrance",
+            "meanAbsShap": 0.0264,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0237,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: fragrance",
+            "meanAbsShap": 0.0233,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: limonene",
+            "meanAbsShap": 0.0226,
+            "direction": "negative",
+            "group": "ingredient"
+          }
+        ],
+        "ingredientShap": [
+          {
+            "feature": "share of colorant",
+            "meanAbsShap": 0.0493,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of texture modifier",
+            "meanAbsShap": 0.0293,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.0283,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.4206,
+            "confirmed": false
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0237,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.0004,
+            "confirmed": true
+          },
+          {
+            "feature": "position: fragrance",
+            "meanAbsShap": 0.0233,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.6837,
+            "confirmed": false
+          },
+          {
+            "feature": "position: limonene",
+            "meanAbsShap": 0.0226,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.5576,
+            "confirmed": false
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.0214,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of antioxidant",
+            "meanAbsShap": 0.0188,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of surfactant",
+            "meanAbsShap": 0.0184,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of stabilizer",
+            "meanAbsShap": 0.0181,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: silica",
+            "meanAbsShap": 0.0178,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.7393,
+            "confirmed": false
+          },
+          {
+            "feature": "n ingredients",
+            "meanAbsShap": 0.017,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of buffer",
+            "meanAbsShap": 0.0169,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "hexyl cinnamal + limonene",
+            "meanAbsShap": 0.0169,
+            "direction": "positive",
+            "group": "combination",
+            "statsQ": 0.2133,
+            "confirmed": false
+          },
+          {
+            "feature": "share of solvent",
+            "meanAbsShap": 0.0162,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          }
+        ],
+        "shapShares": {
+          "baseline": 0.5704,
+          "combination": 0.0415,
+          "functional_group": 0.1269,
+          "ingredient": 0.2612
+        }
+      },
+      "log_reviews": {
+        "label": "Review count (log)",
+        "task": "regression",
+        "n": 5547,
+        "modelComparison": [
+          {
+            "metric": "R²",
+            "modelA": 0.4382,
+            "modelB": 0.4321,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "MAE",
+            "modelA": 1.0293,
+            "modelB": 1.0425,
+            "higherIsBetter": false
+          },
+          {
+            "metric": "RMSE",
+            "modelA": 1.3225,
+            "modelB": 1.3297,
+            "higherIsBetter": false
+          }
+        ],
+        "comparisons": [
+          {
+            "model": "Ridge",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.3958,
+            "b": 0.3443,
+            "gain": -0.0515,
+            "pCorrected": 0.0007,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.4455,
+            "b": 0.4011,
+            "gain": -0.0444,
+            "pCorrected": 0.0,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.4382,
+            "b": 0.4321,
+            "gain": -0.006,
+            "pCorrected": 0.3392,
+            "bWins": 5,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Ridge",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.2296,
+            "b": 0.1257,
+            "gain": -0.104,
+            "pCorrected": 0.0202,
+            "bWins": 0,
+            "folds": 5,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.2889,
+            "b": 0.29,
+            "gain": 0.0011,
+            "pCorrected": 0.7055,
+            "bWins": 3,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.2763,
+            "b": 0.2796,
+            "gain": 0.0033,
+            "pCorrected": 0.5046,
+            "bWins": 3,
+            "folds": 5,
+            "verdict": "no significant difference"
+          }
+        ],
+        "tests": {
+          "total": 434,
+          "significantRaw": 175,
+          "significantAdjusted": 30,
+          "robust": 17
+        },
+        "associations": [
+          {
+            "label": "cyclopentasiloxane",
+            "kind": "ingredient",
+            "effect": 0.4341,
+            "rawEffect": 0.2704,
+            "adjustedP": 0.0,
+            "nWith": 301
+          },
+          {
+            "label": "acetyl hexapeptide-8",
+            "kind": "ingredient",
+            "effect": -0.299,
+            "rawEffect": -0.1505,
+            "adjustedP": 0.0317,
+            "nWith": 101
+          },
+          {
+            "label": "cetyl peg/ppg-10/1 dimethicone",
+            "kind": "ingredient",
+            "effect": 0.283,
+            "rawEffect": 0.3573,
+            "adjustedP": 0.0173,
+            "nWith": 118
+          },
+          {
+            "label": "dimethicone + disteardimonium hectorite",
+            "kind": "combination",
+            "effect": 0.2743,
+            "rawEffect": 0.333,
+            "adjustedP": 0.0021,
+            "nWith": 197
+          },
+          {
+            "label": "methyl methacrylate crosspolymer",
+            "kind": "ingredient",
+            "effect": 0.2701,
+            "rawEffect": 0.2642,
+            "adjustedP": 0.032,
+            "nWith": 101
+          },
+          {
+            "label": "dimethicone crosspolymer",
+            "kind": "ingredient",
+            "effect": 0.2439,
+            "rawEffect": 0.2608,
+            "adjustedP": 0.0472,
+            "nWith": 107
+          },
+          {
+            "label": "aluminum hydroxide",
+            "kind": "ingredient",
+            "effect": 0.24,
+            "rawEffect": 0.3432,
+            "adjustedP": 0.0064,
+            "nWith": 221
+          },
+          {
+            "label": "disteardimonium hectorite",
+            "kind": "ingredient",
+            "effect": 0.2071,
+            "rawEffect": 0.3176,
+            "adjustedP": 0.0021,
+            "nWith": 362
+          },
+          {
+            "label": "citric acid + fragrance + sodium benzoate",
+            "kind": "combination",
+            "effect": -0.147,
+            "rawEffect": -0.2168,
+            "adjustedP": 0.032,
+            "nWith": 486
+          },
+          {
+            "label": "dimethicone + phenoxyethanol + water",
+            "kind": "combination",
+            "effect": 0.1456,
+            "rawEffect": 0.1247,
+            "adjustedP": 0.0071,
+            "nWith": 647
+          },
+          {
+            "label": "butylene glycol + dimethicone + water",
+            "kind": "combination",
+            "effect": 0.1435,
+            "rawEffect": 0.0825,
+            "adjustedP": 0.0198,
+            "nWith": 505
+          },
+          {
+            "label": "butylene glycol + phenoxyethanol + water",
+            "kind": "combination",
+            "effect": 0.1153,
+            "rawEffect": 0.1067,
+            "adjustedP": 0.0198,
+            "nWith": 965
+          },
+          {
+            "label": "citric acid + sodium benzoate",
+            "kind": "combination",
+            "effect": -0.113,
+            "rawEffect": -0.1211,
+            "adjustedP": 0.0358,
+            "nWith": 807
+          },
+          {
+            "label": "dimethicone + glycerin + water",
+            "kind": "combination",
+            "effect": 0.1123,
+            "rawEffect": 0.0714,
+            "adjustedP": 0.0472,
+            "nWith": 669
+          },
+          {
+            "label": "phenoxyethanol",
+            "kind": "ingredient",
+            "effect": 0.1058,
+            "rawEffect": 0.0843,
+            "adjustedP": 0.0123,
+            "nWith": 2489
+          }
+        ],
+        "shap": [
+          {
+            "feature": "child count",
+            "meanAbsShap": 0.4479,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "online only",
+            "meanAbsShap": 0.3581,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "new",
+            "meanAbsShap": 0.1393,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "primary category: Skincare",
+            "meanAbsShap": 0.1306,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "log price",
+            "meanAbsShap": 0.1274,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: fragrance",
+            "meanAbsShap": 0.042,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of preservative",
+            "meanAbsShap": 0.0403,
+            "direction": "positive",
+            "group": "functional_group"
+          },
+          {
+            "feature": "brand: infrequent_sklearn",
+            "meanAbsShap": 0.039,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "limited edition",
+            "meanAbsShap": 0.035,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "sephora exclusive",
+            "meanAbsShap": 0.0337,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "share of colorant",
+            "meanAbsShap": 0.0329,
+            "direction": "positive",
+            "group": "functional_group"
+          },
+          {
+            "feature": "primary category: Makeup",
+            "meanAbsShap": 0.0325,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "primary category: Bath & Body",
+            "meanAbsShap": 0.031,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.0297,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.0291,
+            "direction": "positive",
+            "group": "ingredient"
+          }
+        ],
+        "ingredientShap": [
+          {
+            "feature": "position: fragrance",
+            "meanAbsShap": 0.042,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.8762,
+            "confirmed": false
+          },
+          {
+            "feature": "share of preservative",
+            "meanAbsShap": 0.0403,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of colorant",
+            "meanAbsShap": 0.0329,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.0297,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.0123,
+            "confirmed": true
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.0291,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.18,
+            "confirmed": false
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.0273,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of texture modifier",
+            "meanAbsShap": 0.0266,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: squalane",
+            "meanAbsShap": 0.0229,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.5184,
+            "confirmed": false
+          },
+          {
+            "feature": "share of antioxidant",
+            "meanAbsShap": 0.0228,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of solvent",
+            "meanAbsShap": 0.0212,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of solubilizer",
+            "meanAbsShap": 0.0209,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: synthetic fluorphlogopite",
+            "meanAbsShap": 0.0194,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.0172,
+            "confirmed": false
+          },
+          {
+            "feature": "n ingredients",
+            "meanAbsShap": 0.0191,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of chelator",
+            "meanAbsShap": 0.019,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: coumarin",
+            "meanAbsShap": 0.0182,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.9109,
+            "confirmed": false
+          }
+        ],
+        "shapShares": {
+          "baseline": 0.5421,
+          "combination": 0.0414,
+          "functional_group": 0.1243,
+          "ingredient": 0.2922
+        }
+      },
+      "high_performer": {
+        "label": "High performer (top 25% composite)",
+        "task": "classification",
+        "n": 5547,
+        "modelComparison": [
+          {
+            "metric": "Accuracy",
+            "modelA": 0.7351,
+            "modelB": 0.7694,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "Precision",
+            "modelA": 0.4798,
+            "modelB": 0.5377,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "Recall",
+            "modelA": 0.6818,
+            "modelB": 0.5622,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "F1",
+            "modelA": 0.563,
+            "modelB": 0.5496,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "ROC-AUC",
+            "modelA": 0.8008,
+            "modelB": 0.7903,
+            "higherIsBetter": true
+          }
+        ],
+        "comparisons": [
+          {
+            "model": "Logistic Regression",
+            "cv": "random",
+            "metric": "ROC-AUC",
+            "a": 0.7883,
+            "b": 0.7404,
+            "gain": -0.0479,
+            "pCorrected": 0.0002,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "random",
+            "metric": "ROC-AUC",
+            "a": 0.8037,
+            "b": 0.7827,
+            "gain": -0.0209,
+            "pCorrected": 0.0014,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "random",
+            "metric": "ROC-AUC",
+            "a": 0.8008,
+            "b": 0.7903,
+            "gain": -0.0105,
+            "pCorrected": 0.1248,
+            "bWins": 3,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Logistic Regression",
+            "cv": "unseen_brand",
+            "metric": "ROC-AUC",
+            "a": 0.7163,
+            "b": 0.6542,
+            "gain": -0.0621,
+            "pCorrected": 0.0126,
+            "bWins": 0,
+            "folds": 5,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "unseen_brand",
+            "metric": "ROC-AUC",
+            "a": 0.7336,
+            "b": 0.7372,
+            "gain": 0.0036,
+            "pCorrected": 0.8381,
+            "bWins": 2,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "unseen_brand",
+            "metric": "ROC-AUC",
+            "a": 0.7447,
+            "b": 0.7361,
+            "gain": -0.0086,
+            "pCorrected": 0.5824,
+            "bWins": 1,
+            "folds": 5,
+            "verdict": "no significant difference"
+          }
+        ],
+        "tests": {
+          "total": 434,
+          "significantRaw": 66,
+          "significantAdjusted": 2,
+          "robust": 2
+        },
+        "associations": [
+          {
+            "label": "hydrolyzed vegetable protein pg-propyl silanetriol",
+            "kind": "ingredient",
+            "effect": 0.463,
+            "rawEffect": 0.1159,
+            "adjustedP": 0.0015,
+            "nWith": 121
+          },
+          {
+            "label": "cyclopentasiloxane",
+            "kind": "ingredient",
+            "effect": 0.3129,
+            "rawEffect": 0.1078,
+            "adjustedP": 0.0,
+            "nWith": 301
+          }
+        ],
+        "shap": [
+          {
+            "feature": "child count",
+            "meanAbsShap": 0.7274,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "online only",
+            "meanAbsShap": 0.4054,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "log price",
+            "meanAbsShap": 0.2833,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "primary category: Makeup",
+            "meanAbsShap": 0.1806,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "new",
+            "meanAbsShap": 0.1011,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.0694,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "primary category: Fragrance",
+            "meanAbsShap": 0.0679,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: tocopherol",
+            "meanAbsShap": 0.0642,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: silica",
+            "meanAbsShap": 0.064,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.0622,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of fragrance component",
+            "meanAbsShap": 0.0532,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "share of solvent",
+            "meanAbsShap": 0.0513,
+            "direction": "positive",
+            "group": "functional_group"
+          },
+          {
+            "feature": "n ingredients",
+            "meanAbsShap": 0.0493,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0429,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of stabilizer",
+            "meanAbsShap": 0.0419,
+            "direction": "negative",
+            "group": "functional_group"
+          }
+        ],
+        "ingredientShap": [
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.0694,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: tocopherol",
+            "meanAbsShap": 0.0642,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.8051,
+            "confirmed": false
+          },
+          {
+            "feature": "position: silica",
+            "meanAbsShap": 0.064,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.4893,
+            "confirmed": false
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.0622,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.8051,
+            "confirmed": false
+          },
+          {
+            "feature": "share of fragrance component",
+            "meanAbsShap": 0.0532,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of solvent",
+            "meanAbsShap": 0.0513,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "n ingredients",
+            "meanAbsShap": 0.0493,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0429,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.6762,
+            "confirmed": false
+          },
+          {
+            "feature": "share of stabilizer",
+            "meanAbsShap": 0.0419,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: coumarin",
+            "meanAbsShap": 0.0399,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.8051,
+            "confirmed": false
+          },
+          {
+            "feature": "position: disodium edta",
+            "meanAbsShap": 0.0386,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.8932,
+            "confirmed": false
+          },
+          {
+            "feature": "position: caprylic/capric triglyceride",
+            "meanAbsShap": 0.0385,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.5749,
+            "confirmed": false
+          },
+          {
+            "feature": "share of antioxidant",
+            "meanAbsShap": 0.0376,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: squalane",
+            "meanAbsShap": 0.0355,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.8051,
+            "confirmed": false
+          },
+          {
+            "feature": "share of surfactant",
+            "meanAbsShap": 0.035,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          }
+        ],
+        "shapShares": {
+          "baseline": 0.4464,
+          "combination": 0.058,
+          "functional_group": 0.1358,
+          "ingredient": 0.3599
+        }
+      }
+    },
+    "Skincare": {
+      "rating": {
+        "label": "Average rating",
+        "task": "regression",
+        "n": 1547,
+        "modelComparison": [
+          {
+            "metric": "R²",
+            "modelA": 0.1756,
+            "modelB": 0.204,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "MAE",
+            "modelA": 0.2478,
+            "modelB": 0.2451,
+            "higherIsBetter": false
+          },
+          {
+            "metric": "RMSE",
+            "modelA": 0.3282,
+            "modelB": 0.3225,
+            "higherIsBetter": false
+          }
+        ],
+        "comparisons": [
+          {
+            "model": "Ridge",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.2046,
+            "b": 0.1389,
+            "gain": -0.0658,
+            "pCorrected": 0.047,
+            "bWins": 1,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.2225,
+            "b": 0.1959,
+            "gain": -0.0265,
+            "pCorrected": 0.1443,
+            "bWins": 2,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.1756,
+            "b": 0.204,
+            "gain": 0.0284,
+            "pCorrected": 0.243,
+            "bWins": 11,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Ridge",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.041,
+            "b": 0.0165,
+            "gain": -0.0246,
+            "pCorrected": 0.7247,
+            "bWins": 1,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.0865,
+            "b": 0.082,
+            "gain": -0.0045,
+            "pCorrected": 0.8762,
+            "bWins": 1,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.0249,
+            "b": 0.0654,
+            "gain": 0.0405,
+            "pCorrected": 0.4507,
+            "bWins": 4,
+            "folds": 5,
+            "verdict": "no significant difference"
+          }
+        ],
+        "tests": {
+          "total": 321,
+          "significantRaw": 41,
+          "significantAdjusted": 4,
+          "robust": 4
+        },
+        "associations": [
+          {
+            "label": "dimethicone + phenoxyethanol + silica",
+            "kind": "combination",
+            "effect": -0.4927,
+            "rawEffect": -0.2302,
+            "adjustedP": 0.0034,
+            "nWith": 78
+          },
+          {
+            "label": "tin oxide",
+            "kind": "ingredient",
+            "effect": -0.4322,
+            "rawEffect": -0.2192,
+            "adjustedP": 0.0324,
+            "nWith": 65
+          },
+          {
+            "label": "2-hexanediol",
+            "kind": "ingredient",
+            "effect": 0.3131,
+            "rawEffect": 0.2107,
+            "adjustedP": 0.0034,
+            "nWith": 290
+          },
+          {
+            "label": "butylene glycol + phenoxyethanol",
+            "kind": "combination",
+            "effect": -0.2351,
+            "rawEffect": -0.1143,
+            "adjustedP": 0.0144,
+            "nWith": 474
+          }
+        ],
+        "shap": [
+          {
+            "feature": "log reviews",
+            "meanAbsShap": 0.0548,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "log loves",
+            "meanAbsShap": 0.0414,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "log price",
+            "meanAbsShap": 0.0379,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.016,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "new",
+            "meanAbsShap": 0.0157,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: helianthus annuus (sunflower) seed oil",
+            "meanAbsShap": 0.015,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "secondary category: Eye Care",
+            "meanAbsShap": 0.013,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "online only",
+            "meanAbsShap": 0.0118,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "share of film former",
+            "meanAbsShap": 0.0108,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "position: sodium hyaluronate",
+            "meanAbsShap": 0.0106,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of colorant",
+            "meanAbsShap": 0.0102,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "sephora exclusive",
+            "meanAbsShap": 0.01,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: limonene",
+            "meanAbsShap": 0.0091,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of botanical",
+            "meanAbsShap": 0.0089,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0079,
+            "direction": "positive",
+            "group": "ingredient"
+          }
+        ],
+        "ingredientShap": [
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.016,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.0773,
+            "confirmed": false
+          },
+          {
+            "feature": "position: helianthus annuus (sunflower) seed oil",
+            "meanAbsShap": 0.015,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.1588,
+            "confirmed": false
+          },
+          {
+            "feature": "share of film former",
+            "meanAbsShap": 0.0108,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: sodium hyaluronate",
+            "meanAbsShap": 0.0106,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.207,
+            "confirmed": false
+          },
+          {
+            "feature": "share of colorant",
+            "meanAbsShap": 0.0102,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: limonene",
+            "meanAbsShap": 0.0091,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.7787,
+            "confirmed": false
+          },
+          {
+            "feature": "share of botanical",
+            "meanAbsShap": 0.0089,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0079,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.8907,
+            "confirmed": false
+          },
+          {
+            "feature": "position: 2-hexanediol",
+            "meanAbsShap": 0.0076,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.0034,
+            "confirmed": true
+          },
+          {
+            "feature": "share of stabilizer",
+            "meanAbsShap": 0.0076,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of ph adjuster",
+            "meanAbsShap": 0.0075,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.0074,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.0072,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.6156,
+            "confirmed": false
+          },
+          {
+            "feature": "share of texture modifier",
+            "meanAbsShap": 0.0067,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: ethylhexylglycerin",
+            "meanAbsShap": 0.0065,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.9122,
+            "confirmed": false
+          }
+        ],
+        "shapShares": {
+          "baseline": 0.3194,
+          "combination": 0.0629,
+          "functional_group": 0.1994,
+          "ingredient": 0.4183
+        }
+      },
+      "log_loves": {
+        "label": "Popularity (log loves)",
+        "task": "regression",
+        "n": 1836,
+        "modelComparison": [
+          {
+            "metric": "R²",
+            "modelA": 0.4406,
+            "modelB": 0.4415,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "MAE",
+            "modelA": 0.8684,
+            "modelB": 0.8599,
+            "higherIsBetter": false
+          },
+          {
+            "metric": "RMSE",
+            "modelA": 1.19,
+            "modelB": 1.1882,
+            "higherIsBetter": false
+          }
+        ],
+        "comparisons": [
+          {
+            "model": "Ridge",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.4899,
+            "b": 0.274,
+            "gain": -0.2159,
+            "pCorrected": 0.0,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.4927,
+            "b": 0.45,
+            "gain": -0.0427,
+            "pCorrected": 0.0,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.4406,
+            "b": 0.4415,
+            "gain": 0.0009,
+            "pCorrected": 0.9498,
+            "bWins": 8,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Ridge",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1666,
+            "b": 0.0696,
+            "gain": -0.097,
+            "pCorrected": 0.2803,
+            "bWins": 1,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1929,
+            "b": 0.22,
+            "gain": 0.0271,
+            "pCorrected": 0.1174,
+            "bWins": 4,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1692,
+            "b": 0.1851,
+            "gain": 0.0159,
+            "pCorrected": 0.3623,
+            "bWins": 3,
+            "folds": 5,
+            "verdict": "no significant difference"
+          }
+        ],
+        "tests": {
+          "total": 339,
+          "significantRaw": 63,
+          "significantAdjusted": 7,
+          "robust": 5
+        },
+        "associations": [
+          {
+            "label": "acetyl hexapeptide-8",
+            "kind": "ingredient",
+            "effect": -0.3717,
+            "rawEffect": -0.2356,
+            "adjustedP": 0.0322,
+            "nWith": 85
+          },
+          {
+            "label": "citral + limonene",
+            "kind": "combination",
+            "effect": 0.2767,
+            "rawEffect": 0.1753,
+            "adjustedP": 0.0394,
+            "nWith": 140
+          },
+          {
+            "label": "citral",
+            "kind": "ingredient",
+            "effect": 0.2611,
+            "rawEffect": 0.1697,
+            "adjustedP": 0.0394,
+            "nWith": 153
+          },
+          {
+            "label": "sodium citrate",
+            "kind": "ingredient",
+            "effect": -0.2237,
+            "rawEffect": -0.1798,
+            "adjustedP": 0.028,
+            "nWith": 269
+          },
+          {
+            "label": "sodium hyaluronate",
+            "kind": "ingredient",
+            "effect": -0.1526,
+            "rawEffect": -0.0932,
+            "adjustedP": 0.0332,
+            "nWith": 670
+          }
+        ],
+        "shap": [
+          {
+            "feature": "child count",
+            "meanAbsShap": 0.32,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "new",
+            "meanAbsShap": 0.2377,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "online only",
+            "meanAbsShap": 0.2239,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "log price",
+            "meanAbsShap": 0.2238,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "brand: infrequent_sklearn",
+            "meanAbsShap": 0.1156,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "sephora exclusive",
+            "meanAbsShap": 0.104,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: fragrance",
+            "meanAbsShap": 0.0631,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of buffer",
+            "meanAbsShap": 0.0455,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "share of humectant",
+            "meanAbsShap": 0.0453,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.0446,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "brand: The Ordinary",
+            "meanAbsShap": 0.043,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.0366,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0358,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of surfactant",
+            "meanAbsShap": 0.0336,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "share of skin conditioning",
+            "meanAbsShap": 0.0287,
+            "direction": "negative",
+            "group": "functional_group"
+          }
+        ],
+        "ingredientShap": [
+          {
+            "feature": "position: fragrance",
+            "meanAbsShap": 0.0631,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.6945,
+            "confirmed": false
+          },
+          {
+            "feature": "share of buffer",
+            "meanAbsShap": 0.0455,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of humectant",
+            "meanAbsShap": 0.0453,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.0446,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.0366,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.2219,
+            "confirmed": false
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0358,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.1195,
+            "confirmed": false
+          },
+          {
+            "feature": "share of surfactant",
+            "meanAbsShap": 0.0336,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of skin conditioning",
+            "meanAbsShap": 0.0287,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "n ingredients",
+            "meanAbsShap": 0.0267,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of botanical",
+            "meanAbsShap": 0.0264,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of solvent",
+            "meanAbsShap": 0.0263,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of antioxidant",
+            "meanAbsShap": 0.0261,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: citric acid",
+            "meanAbsShap": 0.0248,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.0656,
+            "confirmed": false
+          },
+          {
+            "feature": "position: propanediol",
+            "meanAbsShap": 0.0244,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.2957,
+            "confirmed": false
+          },
+          {
+            "feature": "position: sodium hyaluronate",
+            "meanAbsShap": 0.0236,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.0332,
+            "confirmed": true
+          }
+        ],
+        "shapShares": {
+          "baseline": 0.4632,
+          "combination": 0.054,
+          "functional_group": 0.1586,
+          "ingredient": 0.3242
+        }
+      },
+      "log_reviews": {
+        "label": "Review count (log)",
+        "task": "regression",
+        "n": 1836,
+        "modelComparison": [
+          {
+            "metric": "R²",
+            "modelA": 0.3344,
+            "modelB": 0.3428,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "MAE",
+            "modelA": 1.1062,
+            "modelB": 1.1139,
+            "higherIsBetter": false
+          },
+          {
+            "metric": "RMSE",
+            "modelA": 1.4218,
+            "modelB": 1.4122,
+            "higherIsBetter": false
+          }
+        ],
+        "comparisons": [
+          {
+            "model": "Ridge",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.3592,
+            "b": 0.1993,
+            "gain": -0.1599,
+            "pCorrected": 0.0,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.3821,
+            "b": 0.3404,
+            "gain": -0.0417,
+            "pCorrected": 0.0008,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.3344,
+            "b": 0.3428,
+            "gain": 0.0084,
+            "pCorrected": 0.6549,
+            "bWins": 9,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Ridge",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1716,
+            "b": 0.0229,
+            "gain": -0.1486,
+            "pCorrected": 0.0443,
+            "bWins": 0,
+            "folds": 5,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1877,
+            "b": 0.1568,
+            "gain": -0.0309,
+            "pCorrected": 0.3956,
+            "bWins": 2,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1501,
+            "b": 0.1368,
+            "gain": -0.0133,
+            "pCorrected": 0.6548,
+            "bWins": 2,
+            "folds": 5,
+            "verdict": "no significant difference"
+          }
+        ],
+        "tests": {
+          "total": 339,
+          "significantRaw": 12,
+          "significantAdjusted": 0,
+          "robust": 0
+        },
+        "associations": [],
+        "shap": [
+          {
+            "feature": "child count",
+            "meanAbsShap": 0.3793,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "online only",
+            "meanAbsShap": 0.2366,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "log price",
+            "meanAbsShap": 0.1924,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "new",
+            "meanAbsShap": 0.171,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "sephora exclusive",
+            "meanAbsShap": 0.1051,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: fragrance",
+            "meanAbsShap": 0.0892,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.0632,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of humectant",
+            "meanAbsShap": 0.0555,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "brand: infrequent_sklearn",
+            "meanAbsShap": 0.0537,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "share of thickener",
+            "meanAbsShap": 0.0515,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "position: squalane",
+            "meanAbsShap": 0.0505,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of stabilizer",
+            "meanAbsShap": 0.0459,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.0444,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "share of buffer",
+            "meanAbsShap": 0.0439,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "share of preservative",
+            "meanAbsShap": 0.0438,
+            "direction": "positive",
+            "group": "functional_group"
+          }
+        ],
+        "ingredientShap": [
+          {
+            "feature": "position: fragrance",
+            "meanAbsShap": 0.0892,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.9574,
+            "confirmed": false
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.0632,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.8203,
+            "confirmed": false
+          },
+          {
+            "feature": "share of humectant",
+            "meanAbsShap": 0.0555,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of thickener",
+            "meanAbsShap": 0.0515,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: squalane",
+            "meanAbsShap": 0.0505,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.8625,
+            "confirmed": false
+          },
+          {
+            "feature": "share of stabilizer",
+            "meanAbsShap": 0.0459,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.0444,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of buffer",
+            "meanAbsShap": 0.0439,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of preservative",
+            "meanAbsShap": 0.0438,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: caprylic/capric triglyceride",
+            "meanAbsShap": 0.0432,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.8338,
+            "confirmed": false
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0417,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.1782,
+            "confirmed": false
+          },
+          {
+            "feature": "share of antioxidant",
+            "meanAbsShap": 0.0409,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.0397,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.1782,
+            "confirmed": false
+          },
+          {
+            "feature": "share of botanical",
+            "meanAbsShap": 0.0388,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: disodium edta",
+            "meanAbsShap": 0.0381,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.3448,
+            "confirmed": false
+          }
+        ],
+        "shapShares": {
+          "baseline": 0.3784,
+          "combination": 0.0559,
+          "functional_group": 0.1887,
+          "ingredient": 0.3771
+        }
+      },
+      "rec_rate": {
+        "label": "Recommendation rate",
+        "task": "regression",
+        "n": 1529,
+        "modelComparison": [
+          {
+            "metric": "R²",
+            "modelA": 0.1993,
+            "modelB": 0.233,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "MAE",
+            "modelA": 0.0734,
+            "modelB": 0.0724,
+            "higherIsBetter": false
+          },
+          {
+            "metric": "RMSE",
+            "modelA": 0.0979,
+            "modelB": 0.096,
+            "higherIsBetter": false
+          }
+        ],
+        "comparisons": [
+          {
+            "model": "Ridge",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.2258,
+            "b": 0.1322,
+            "gain": -0.0936,
+            "pCorrected": 0.0004,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.2361,
+            "b": 0.2062,
+            "gain": -0.03,
+            "pCorrected": 0.1028,
+            "bWins": 2,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "random",
+            "metric": "R²",
+            "a": 0.1993,
+            "b": 0.233,
+            "gain": 0.0336,
+            "pCorrected": 0.3484,
+            "bWins": 11,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Ridge",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1248,
+            "b": 0.0388,
+            "gain": -0.086,
+            "pCorrected": 0.2749,
+            "bWins": 0,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1711,
+            "b": 0.1449,
+            "gain": -0.0262,
+            "pCorrected": 0.0685,
+            "bWins": 0,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "unseen_brand",
+            "metric": "R²",
+            "a": 0.1239,
+            "b": 0.1513,
+            "gain": 0.0274,
+            "pCorrected": 0.1762,
+            "bWins": 4,
+            "folds": 5,
+            "verdict": "no significant difference"
+          }
+        ],
+        "tests": {
+          "total": 318,
+          "significantRaw": 54,
+          "significantAdjusted": 8,
+          "robust": 7
+        },
+        "associations": [
+          {
+            "label": "lactobacillus ferment",
+            "kind": "ingredient",
+            "effect": 0.493,
+            "rawEffect": 0.2073,
+            "adjustedP": 0.0168,
+            "nWith": 63
+          },
+          {
+            "label": "dimethicone + phenoxyethanol + silica",
+            "kind": "combination",
+            "effect": -0.4237,
+            "rawEffect": -0.1895,
+            "adjustedP": 0.0308,
+            "nWith": 74
+          },
+          {
+            "label": "2-hexanediol",
+            "kind": "ingredient",
+            "effect": 0.3132,
+            "rawEffect": 0.2386,
+            "adjustedP": 0.0087,
+            "nWith": 290
+          },
+          {
+            "label": "butylene glycol + phenoxyethanol + tocopheryl acetate",
+            "kind": "combination",
+            "effect": -0.2699,
+            "rawEffect": -0.1517,
+            "adjustedP": 0.049,
+            "nWith": 175
+          },
+          {
+            "label": "butylene glycol + phenoxyethanol",
+            "kind": "combination",
+            "effect": -0.245,
+            "rawEffect": -0.1005,
+            "adjustedP": 0.0155,
+            "nWith": 455
+          },
+          {
+            "label": "phenoxyethanol",
+            "kind": "ingredient",
+            "effect": -0.2095,
+            "rawEffect": -0.1162,
+            "adjustedP": 0.049,
+            "nWith": 813
+          },
+          {
+            "label": "propanediol",
+            "kind": "ingredient",
+            "effect": 0.1939,
+            "rawEffect": 0.1363,
+            "adjustedP": 0.0478,
+            "nWith": 540
+          }
+        ],
+        "shap": [
+          {
+            "feature": "log reviews",
+            "meanAbsShap": 0.0202,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "log loves",
+            "meanAbsShap": 0.0189,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "log price",
+            "meanAbsShap": 0.0084,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "new",
+            "meanAbsShap": 0.0047,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.0042,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of texture modifier",
+            "meanAbsShap": 0.0041,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "position: limonene",
+            "meanAbsShap": 0.0033,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.0032,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "sephora exclusive",
+            "meanAbsShap": 0.003,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "secondary category: Treatments",
+            "meanAbsShap": 0.003,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "share of film former",
+            "meanAbsShap": 0.0029,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "share of stabilizer",
+            "meanAbsShap": 0.0029,
+            "direction": "positive",
+            "group": "functional_group"
+          },
+          {
+            "feature": "position: sodium hyaluronate",
+            "meanAbsShap": 0.0028,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of ph adjuster",
+            "meanAbsShap": 0.0027,
+            "direction": "positive",
+            "group": "functional_group"
+          },
+          {
+            "feature": "position: 2-hexanediol",
+            "meanAbsShap": 0.0027,
+            "direction": "positive",
+            "group": "ingredient"
+          }
+        ],
+        "ingredientShap": [
+          {
+            "feature": "position: phenoxyethanol",
+            "meanAbsShap": 0.0042,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.049,
+            "confirmed": true
+          },
+          {
+            "feature": "share of texture modifier",
+            "meanAbsShap": 0.0041,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: limonene",
+            "meanAbsShap": 0.0033,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.8159,
+            "confirmed": false
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.0032,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.4335,
+            "confirmed": false
+          },
+          {
+            "feature": "share of film former",
+            "meanAbsShap": 0.0029,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of stabilizer",
+            "meanAbsShap": 0.0029,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: sodium hyaluronate",
+            "meanAbsShap": 0.0028,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.364,
+            "confirmed": false
+          },
+          {
+            "feature": "share of ph adjuster",
+            "meanAbsShap": 0.0027,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: 2-hexanediol",
+            "meanAbsShap": 0.0027,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.0087,
+            "confirmed": true
+          },
+          {
+            "feature": "share of colorant",
+            "meanAbsShap": 0.0025,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0025,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.6087,
+            "confirmed": false
+          },
+          {
+            "feature": "share of botanical",
+            "meanAbsShap": 0.0025,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: tocopherol",
+            "meanAbsShap": 0.0025,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.1269,
+            "confirmed": false
+          },
+          {
+            "feature": "position: helianthus annuus (sunflower) seed oil",
+            "meanAbsShap": 0.0024,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.2488,
+            "confirmed": false
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.0023,
+            "direction": "positive",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          }
+        ],
+        "shapShares": {
+          "baseline": 0.3326,
+          "combination": 0.077,
+          "functional_group": 0.1979,
+          "ingredient": 0.3925
+        }
+      },
+      "high_performer": {
+        "label": "High performer (top 25% composite)",
+        "task": "classification",
+        "n": 1836,
+        "modelComparison": [
+          {
+            "metric": "Accuracy",
+            "modelA": 0.7213,
+            "modelB": 0.7723,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "Precision",
+            "modelA": 0.4579,
+            "modelB": 0.5631,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "Recall",
+            "modelA": 0.6049,
+            "modelB": 0.4051,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "F1",
+            "modelA": 0.5202,
+            "modelB": 0.4699,
+            "higherIsBetter": true
+          },
+          {
+            "metric": "ROC-AUC",
+            "modelA": 0.7734,
+            "modelB": 0.7762,
+            "higherIsBetter": true
+          }
+        ],
+        "comparisons": [
+          {
+            "model": "Logistic Regression",
+            "cv": "random",
+            "metric": "ROC-AUC",
+            "a": 0.7984,
+            "b": 0.6799,
+            "gain": -0.1185,
+            "pCorrected": 0.0,
+            "bWins": 0,
+            "folds": 15,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "random",
+            "metric": "ROC-AUC",
+            "a": 0.7939,
+            "b": 0.7827,
+            "gain": -0.0112,
+            "pCorrected": 0.1941,
+            "bWins": 4,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "random",
+            "metric": "ROC-AUC",
+            "a": 0.7734,
+            "b": 0.7762,
+            "gain": 0.0029,
+            "pCorrected": 0.8042,
+            "bWins": 10,
+            "folds": 15,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "Logistic Regression",
+            "cv": "unseen_brand",
+            "metric": "ROC-AUC",
+            "a": 0.7377,
+            "b": 0.5879,
+            "gain": -0.1498,
+            "pCorrected": 0.0095,
+            "bWins": 0,
+            "folds": 5,
+            "verdict": "A better"
+          },
+          {
+            "model": "Random Forest",
+            "cv": "unseen_brand",
+            "metric": "ROC-AUC",
+            "a": 0.7177,
+            "b": 0.716,
+            "gain": -0.0017,
+            "pCorrected": 0.9535,
+            "bWins": 3,
+            "folds": 5,
+            "verdict": "no significant difference"
+          },
+          {
+            "model": "LightGBM",
+            "cv": "unseen_brand",
+            "metric": "ROC-AUC",
+            "a": 0.7052,
+            "b": 0.7092,
+            "gain": 0.004,
+            "pCorrected": 0.7941,
+            "bWins": 3,
+            "folds": 5,
+            "verdict": "no significant difference"
+          }
+        ],
+        "tests": {
+          "total": 339,
+          "significantRaw": 10,
+          "significantAdjusted": 0,
+          "robust": 0
+        },
+        "associations": [],
+        "shap": [
+          {
+            "feature": "child count",
+            "meanAbsShap": 0.6448,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "log price",
+            "meanAbsShap": 0.3743,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "online only",
+            "meanAbsShap": 0.3001,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "sephora exclusive",
+            "meanAbsShap": 0.2431,
+            "direction": "positive",
+            "group": "baseline"
+          },
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.2072,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: fragrance",
+            "meanAbsShap": 0.1856,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "new",
+            "meanAbsShap": 0.1827,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "brand: infrequent_sklearn",
+            "meanAbsShap": 0.1657,
+            "direction": "negative",
+            "group": "baseline"
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.111,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "n ingredients",
+            "meanAbsShap": 0.1034,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: squalane",
+            "meanAbsShap": 0.093,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0906,
+            "direction": "negative",
+            "group": "ingredient"
+          },
+          {
+            "feature": "position: sodium hyaluronate",
+            "meanAbsShap": 0.0829,
+            "direction": "positive",
+            "group": "ingredient"
+          },
+          {
+            "feature": "share of botanical",
+            "meanAbsShap": 0.0821,
+            "direction": "negative",
+            "group": "functional_group"
+          },
+          {
+            "feature": "share of fragrance component",
+            "meanAbsShap": 0.0812,
+            "direction": "negative",
+            "group": "functional_group"
+          }
+        ],
+        "ingredientShap": [
+          {
+            "feature": "position: water",
+            "meanAbsShap": 0.2072,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.7912,
+            "confirmed": false
+          },
+          {
+            "feature": "position: fragrance",
+            "meanAbsShap": 0.1856,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.5812,
+            "confirmed": false
+          },
+          {
+            "feature": "share of emollient",
+            "meanAbsShap": 0.111,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "n ingredients",
+            "meanAbsShap": 0.1034,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: squalane",
+            "meanAbsShap": 0.093,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.8427,
+            "confirmed": false
+          },
+          {
+            "feature": "position: glycerin",
+            "meanAbsShap": 0.0906,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.7912,
+            "confirmed": false
+          },
+          {
+            "feature": "position: sodium hyaluronate",
+            "meanAbsShap": 0.0829,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.8012,
+            "confirmed": false
+          },
+          {
+            "feature": "share of botanical",
+            "meanAbsShap": 0.0821,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of fragrance component",
+            "meanAbsShap": 0.0812,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of humectant",
+            "meanAbsShap": 0.0807,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: caprylic/capric triglyceride",
+            "meanAbsShap": 0.0771,
+            "direction": "negative",
+            "group": "ingredient",
+            "statsQ": 0.6941,
+            "confirmed": false
+          },
+          {
+            "feature": "share of buffer",
+            "meanAbsShap": 0.0738,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "position: tocopherol",
+            "meanAbsShap": 0.0733,
+            "direction": "positive",
+            "group": "ingredient",
+            "statsQ": 0.955,
+            "confirmed": false
+          },
+          {
+            "feature": "share of preservative",
+            "meanAbsShap": 0.0672,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          },
+          {
+            "feature": "share of antioxidant",
+            "meanAbsShap": 0.0664,
+            "direction": "negative",
+            "group": "functional_group",
+            "statsQ": null,
+            "confirmed": null
+          }
+        ],
+        "shapShares": {
+          "baseline": 0.3101,
+          "combination": 0.0712,
+          "functional_group": 0.1736,
+          "ingredient": 0.4451
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+\begin{table*}[t]
+\centering
+\caption{Ablation of ingredient feature families (LightGBM, random CV).}
+\label{tab:ablation}
+\footnotesize
+\begin{tabular}{lllrrrr}
+\toprule
+Scope & Target & Variant & Score & $\Delta$ vs A & $p_{corr}$ & $q$ \\
+\midrule
+All & Rating & B & 0.250 & $+0.008$ & 0.540 & -- \\
+All & Rating & A+ingredients & 0.252 & $+0.011$ & 0.410 & 0.692 \\
+All & Rating & A+functional & 0.239 & $-0.003$ & 0.783 & 0.906 \\
+All & Rating & A+combinations & 0.253 & $+0.011$ & 0.042 & 0.163 \\
+All & Rating & ingredients\_only & 0.082 & $-0.159$ & $<$0.001 & -- \\
+\midrule
+All & Loves (log) & B & 0.520 & $-0.004$ & 0.509 & -- \\
+All & Loves (log) & A+ingredients & 0.527 & $+0.002$ & 0.760 & 0.906 \\
+All & Loves (log) & A+functional & 0.512 & $-0.012$ & 0.010 & 0.129 \\
+All & Loves (log) & A+combinations & 0.530 & $+0.005$ & 0.323 & 0.623 \\
+All & Loves (log) & ingredients\_only & 0.193 & $-0.331$ & $<$0.001 & -- \\
+\midrule
+All & Reviews (log) & B & 0.432 & $-0.006$ & 0.339 & -- \\
+All & Reviews (log) & A+ingredients & 0.437 & $-0.001$ & 0.906 & 0.906 \\
+All & Reviews (log) & A+functional & 0.422 & $-0.016$ & 0.005 & 0.129 \\
+All & Reviews (log) & A+combinations & 0.441 & $+0.002$ & 0.515 & 0.732 \\
+All & Reviews (log) & ingredients\_only & 0.107 & $-0.331$ & $<$0.001 & -- \\
+\midrule
+All & High performer & B & 0.790 & $-0.011$ & 0.125 & -- \\
+All & High performer & A+ingredients & 0.793 & $-0.008$ & 0.288 & 0.598 \\
+All & High performer & A+functional & 0.787 & $-0.014$ & 0.037 & 0.163 \\
+All & High performer & A+combinations & 0.801 & $+0.000$ & 0.904 & 0.906 \\
+All & High performer & ingredients\_only & 0.640 & $-0.161$ & $<$0.001 & -- \\
+\midrule
+Skincare & Rating & B & 0.204 & $+0.028$ & 0.243 & -- \\
+Skincare & Rating & A+ingredients & 0.238 & $+0.062$ & 0.020 & 0.163 \\
+Skincare & Rating & A+functional & 0.178 & $+0.002$ & 0.903 & 0.906 \\
+Skincare & Rating & A+combinations & 0.216 & $+0.041$ & 0.058 & 0.189 \\
+Skincare & Rating & ingredients\_only & 0.049 & $-0.127$ & 0.002 & -- \\
+\midrule
+Skincare & Loves (log) & B & 0.441 & $+0.001$ & 0.950 & -- \\
+Skincare & Loves (log) & A+ingredients & 0.459 & $+0.019$ & 0.063 & 0.189 \\
+Skincare & Loves (log) & A+functional & 0.419 & $-0.022$ & 0.125 & 0.306 \\
+Skincare & Loves (log) & A+combinations & 0.448 & $+0.007$ & 0.515 & 0.732 \\
+Skincare & Loves (log) & ingredients\_only & 0.070 & $-0.371$ & $<$0.001 & -- \\
+\midrule
+Skincare & Reviews (log) & B & 0.343 & $+0.008$ & 0.655 & -- \\
+Skincare & Reviews (log) & A+ingredients & 0.350 & $+0.016$ & 0.366 & 0.659 \\
+Skincare & Reviews (log) & A+functional & 0.313 & $-0.021$ & 0.141 & 0.318 \\
+Skincare & Reviews (log) & A+combinations & 0.331 & $-0.003$ & 0.850 & 0.906 \\
+Skincare & Reviews (log) & ingredients\_only & 0.040 & $-0.294$ & $<$0.001 & -- \\
+\midrule
+Skincare & Recommend rate & B & 0.233 & $+0.034$ & 0.348 & -- \\
+Skincare & Recommend rate & A+ingredients & 0.255 & $+0.056$ & 0.101 & 0.272 \\
+Skincare & Recommend rate & A+functional & 0.212 & $+0.013$ & 0.657 & 0.844 \\
+Skincare & Recommend rate & A+combinations & 0.245 & $+0.046$ & 0.026 & 0.163 \\
+Skincare & Recommend rate & ingredients\_only & 0.034 & $-0.166$ & 0.001 & -- \\
+\midrule
+Skincare & High performer & B & 0.776 & $+0.003$ & 0.804 & -- \\
+Skincare & High performer & A+ingredients & 0.783 & $+0.010$ & 0.469 & 0.732 \\
+Skincare & High performer & A+functional & 0.749 & $-0.025$ & 0.039 & 0.163 \\
+Skincare & High performer & A+combinations & 0.770 & $-0.004$ & 0.636 & 0.844 \\
+Skincare & High performer & ingredients\_only & 0.628 & $-0.145$ & $<$0.001 & -- \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{\linewidth}{\scriptsize Score: $R^2$, or ROC-AUC for high performer. $q$: Benjamini--Hochberg over the three single-family variants of all targets. B is the main comparison and ingredients\_only (no metadata) a reference point, so neither is tested here.}
+\end{table*}

@@ -27,6 +27,21 @@ ENV/
 data/raw/
 data/processed/
 
+# Research run output: tables are rebuilt by scripts/run_research.py;
+# only results.json (and the docs it generates) are committed
+data/research/*.log
+
+# LaTeX build output (paper/)
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.synctex.gz
+paper/main.pdf
+
 # Large/local data files
 *.csv
 *.zip
