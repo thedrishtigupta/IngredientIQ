@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useAuth } from "@/lib/api";
 import { useCompare } from "@/lib/compare-store";
 
 const links = [
@@ -12,6 +13,9 @@ const links = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const { ids } = useCompare();
+  const { user, loading } = useAuth();
+  // Short label for the account link: the user's first name, or "Sign in".
+  const accountLabel = user ? (user.display_name.split(/\s+/)[0] ?? "Account") : "Sign in";
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-sm">
@@ -43,6 +47,24 @@ export function Navbar() {
           >
             Search
           </Link>
+          <Link
+            to={user ? "/account" : "/login"}
+            className={`flex items-center gap-2 text-sm text-foreground/80 hover:text-foreground ${loading ? "invisible" : ""}`}
+            activeProps={{ className: "text-foreground font-medium" }}
+          >
+            <span
+              aria-hidden="true"
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-border-strong text-[0.7rem] uppercase"
+            >
+              {user ? user.display_name.charAt(0) : (
+                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" strokeLinecap="round" />
+                </svg>
+              )}
+            </span>
+            <span className="hidden max-w-[9rem] truncate lg:inline">{accountLabel}</span>
+          </Link>
         </nav>
 
         <button
@@ -73,6 +95,13 @@ export function Navbar() {
               {l.label}
             </Link>
           ))}
+          <Link
+            to={user ? "/account" : "/login"}
+            onClick={() => setOpen(false)}
+            className="block border-b border-border px-5 py-4 text-sm"
+          >
+            {user ? `My account (${accountLabel})` : "Sign in"}
+          </Link>
         </nav>
       ) : null}
     </header>

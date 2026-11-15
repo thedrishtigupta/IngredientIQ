@@ -1,4 +1,4 @@
-import type { RecommendBody } from "./api";
+import type { Profile, RecommendBody } from "./api";
 
 /** What the user fills in on the Explore page. `toBody` turns it into the POST /recommend body. */
 export type SearchForm = {
@@ -70,3 +70,31 @@ export const PRESETS: { id: string; label: string; form: SearchForm }[] = [
     form: { ...emptyForm, goals: ["hair_conditioning"], category: "Hair" },
   },
 ];
+
+/** Fill the form from a saved goal search (history `params`, i.e. a /recommend body). */
+export function fromParams(p: Record<string, unknown>): SearchForm {
+  const strings = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : []);
+  const text = (v: unknown) => (typeof v === "string" && v ? v : null);
+  const excluded = strings(p["excluded_ingredients"]);
+  return {
+    goals: strings(p["goals"]),
+    category: text(p["category"]),
+    subcategory: text(p["subcategory"]),
+    maxPrice: typeof p["max_price"] === "number" ? p["max_price"] : null,
+    fragranceFree: excluded.includes("fragrance"),
+    required: strings(p["required_ingredients"]).join(", "),
+    excluded: excluded.filter((x) => x !== "fragrance").join(", "),
+  };
+}
+
+/** Fill the form from the user's profile (goals, category, budget, ingredients to avoid). */
+export function fromProfile(p: Profile): SearchForm {
+  return {
+    ...emptyForm,
+    goals: p.goals,
+    category: p.preferred_category,
+    maxPrice: p.max_price,
+    fragranceFree: p.fragrance_free || p.avoided_ingredients.includes("fragrance"),
+    excluded: p.avoided_ingredients.filter((x) => x !== "fragrance").join(", "),
+  };
+}

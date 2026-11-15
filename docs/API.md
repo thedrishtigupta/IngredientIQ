@@ -217,3 +217,37 @@ products first (each product counted once). Takes about 0.3 s. `functional_group
 - `catalog_share`: share of all products that contain it (0..1). `avg_rating` / `median_price`: over those products.
 - `related`: the 6 ingredients found together with it in the most products (`product_count` = products with both).
 - `products`: the most-loved products containing it (up to 12).
+
+## Accounts
+
+Sign up or sign in to get a **token**, then send it on every request as
+`Authorization: Bearer <token>` (valid 30 days). Passwords are hashed with scrypt; only a
+SHA-256 of each token is stored. Tables: `sql/004_users.sql` (the API creates them at startup).
+All `/me/*` endpoints return **401** without a valid token.
+
+| Method & path | What it does |
+|---|---|
+| `POST /auth/register` `{email, password (8+ chars), display_name}` | Create account, returns `{token, user}` (201). 409 if the email exists. |
+| `POST /auth/login` `{email, password}` | Returns `{token, user}`. 401 "Email or password is incorrect." |
+| `POST /auth/logout` | Ends this token's session (204). |
+| `GET /me` | User + `profile`. |
+| `PUT /me/profile` | Replace the profile: `{skin_type, goals[], avoided_ingredients[], fragrance_free, max_price, preferred_category}`. |
+| `GET /me/recommendations?top_k=8` | Same response as `POST /recommend`, built from the profile. |
+| `GET /me/history?limit=50` | Searches, newest first: `{search_id, kind: "text"\|"recommend", query, params, result_count, created_at}`. |
+| `DELETE /me/history` / `DELETE /me/history/{search_id}` | Clear all / delete one (204; 404 if not yours). |
+| `GET /me/saved` | Saved products (product summary + `saved_at`). |
+| `PUT /me/saved/{product_id}` / `DELETE /me/saved/{product_id}` | Save / unsave (204). |
+
+**Recording history:** searches are only recorded when the user is signed in **and** asks for it:
+`GET /products?q=...&record_history=true`, or `"record_history": true` in the `POST /recommend` body.
+Repeating the latest search refreshes it instead of adding a duplicate; the newest 200 are kept.
+
+```json
+// POST /auth/register
+{"email": "sam@example.com", "password": "a long password", "display_name": "Sam"}
+// -> 201
+{"token": "x7G…", "user": {"user_id": 1, "email": "sam@example.com", "display_name": "Sam",
+  "created_at": "2026-11-15T22:10:00Z",
+  "profile": {"skin_type": null, "goals": [], "avoided_ingredients": [], "fragrance_free": false,
+              "max_price": null, "preferred_category": null}}}
+```

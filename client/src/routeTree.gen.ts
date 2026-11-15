@@ -10,15 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as IngredientsRouteImport } from './routes/ingredients'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResearchRouteImport } from './routes/research'
 import { Route as ProductProductIdRouteImport } from './routes/product.$productId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareRoute = CompareRouteImport.update({
@@ -36,6 +43,11 @@ const IngredientsRoute = IngredientsRouteImport.update({
   path: '/ingredients',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResearchRoute = ResearchRouteImport.update({
   id: '/research',
   path: '/research',
@@ -49,26 +61,32 @@ const ProductProductIdRoute = ProductProductIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/compare': typeof CompareRoute
   '/explore': typeof ExploreRoute
   '/ingredients': typeof IngredientsRoute
+  '/login': typeof LoginRoute
   '/research': typeof ResearchRoute
   '/product/$productId': typeof ProductProductIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/compare': typeof CompareRoute
   '/explore': typeof ExploreRoute
   '/ingredients': typeof IngredientsRoute
+  '/login': typeof LoginRoute
   '/research': typeof ResearchRoute
   '/product/$productId': typeof ProductProductIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/compare': typeof CompareRoute
   '/explore': typeof ExploreRoute
   '/ingredients': typeof IngredientsRoute
+  '/login': typeof LoginRoute
   '/research': typeof ResearchRoute
   '/product/$productId': typeof ProductProductIdRoute
 }
@@ -76,34 +94,42 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
     | '/compare'
     | '/explore'
     | '/ingredients'
+    | '/login'
     | '/research'
     | '/product/$productId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account'
     | '/compare'
     | '/explore'
     | '/ingredients'
+    | '/login'
     | '/research'
     | '/product/$productId'
   id:
     | '__root__'
     | '/'
+    | '/account'
     | '/compare'
     | '/explore'
     | '/ingredients'
+    | '/login'
     | '/research'
     | '/product/$productId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
   CompareRoute: typeof CompareRoute
   ExploreRoute: typeof ExploreRoute
   IngredientsRoute: typeof IngredientsRoute
+  LoginRoute: typeof LoginRoute
   ResearchRoute: typeof ResearchRoute
   ProductProductIdRoute: typeof ProductProductIdRoute
 }
@@ -115,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare': {
@@ -138,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IngredientsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/research': {
       id: '/research'
       path: '/research'
@@ -157,9 +197,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
   CompareRoute: CompareRoute,
   ExploreRoute: ExploreRoute,
   IngredientsRoute: IngredientsRoute,
+  LoginRoute: LoginRoute,
   ResearchRoute: ResearchRoute,
   ProductProductIdRoute: ProductProductIdRoute,
 }

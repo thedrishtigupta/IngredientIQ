@@ -1,5 +1,6 @@
 """Request and response shapes of the API (shown in the /docs page)."""
-from datetime import date
+import re
+from datetime import date, datetime
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -19,6 +20,7 @@ class RecommendBody(BaseModel):
     excluded_ingredients: list[str] = Field(default=[], examples=[["fragrance"]])
     top_k: int = Field(default=10, ge=1, le=20)
     explain: bool = True  # add a short plain-English summary to every result
+    record_history: bool = False  # signed-in users only: add this search to their history
 
     @field_validator("goals")
     @classmethod
@@ -189,3 +191,109 @@ class IngredientDetail(IngredientListItem):
     median_price: Optional[float] = None
     related: list[RelatedIngredient]  # most often found together with it
     products: list[ProductSummary]  # most-loved products containing it (up to 12)
+
+# ---------- accounts: /auth/*, /me/* ----------
+
+SKIN_TYPES = ("dry", "oily", "combination", "normal", "sensitive")
+_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+class RegisterBody(BaseModel):
+    email: str = Field(max_length=254, examples=["sam@example.com"])
+    password: str = Field(min_length=8, max_length=200)
+    display_name: str = Field(min_length=1, max_length=60, examples=["Sam"])
+
+    @field_validator("email")
+    @classmethod
+    def email_looks_valid(cls, email):
+        email = email.strip().lower()
+        if not _EMAIL.match(email):
+            raise ValueError("Enter a valid email address.")
+        return email
+
+    @field_validator("display_name")
+    @classmethod
+    def name_not_blank(cls, name):
+        name = name.strip()
+        if not name:
+            raise ValueError("Enter a name.")
+        return name
+
+
+class LoginBody(BaseModel):
+    email: str = Field(max_length=254)
+    password: str = Field(max_length=200)
+
+    @field_validator("email")
+    @classmethod
+    def normalise(cls, email):
+        return email.strip().lower()
+
+
+class User(BaseModel):
+    user_id: int
+    email: str
+    display_name: str
+    created_at: datetime
+
+
+class Profile(BaseModel):
+    """Preferences used to personalise searches. Every field is optional."""
+    skin_type: Optional[str] = Field(default=None, examples=["combination"])
+    goals: list[str] = Field(default=[], max_length=11, examples=[["hydration", "soothing"]])
+    avoided_ingredients: list[str] = Field(default=[], max_length=30, examples=[["alcohol"]])
+    fragrance_free: bool = False
+    max_price: Optional[float] = Field(default=None, gt=0, le=10000)
+    preferred_category: Optional[str] = Field(default=None, max_length=100)
+
+    @field_validator("skin_type")
+    @classmethod
+    def skin_type_known(cls, value):
+        if value in (None, ""):
+            return None
+        value = value.strip().lower()
+        if value not in SKIN_TYPES:
+            raise ValueError(f"Skin type must be one of {list(SKIN_TYPES)}")
+        return value
+
+    @field_validator("goals")
+    @classmethod
+    def goals_known(cls, goals):
+        return RecommendBody.goals_must_be_known(goals)
+
+    @field_validator("avoided_ingredients")
+    @classmethod
+    def clean_ingredients(cls, names):
+        out = []
+        for n in names:
+            n = n.strip().lower()[:100]
+            if n and n not in out:
+                out.append(n)
+        return out
+
+    @field_validator("preferred_category")
+    @classmethod
+    def blank_is_none(cls, value):
+        return (value or "").strip() or None
+
+
+class Me(User):
+    profile: Profile
+
+
+class AuthResponse(BaseModel):
+    token: str  # send as "Authorization: Bearer <token>"; valid for 30 days
+    user: Me
+
+
+class HistoryItem(BaseModel):
+    search_id: int
+    kind: str  # "text" or "recommend"
+    query: str  # what was typed, or a readable summary of the filters
+    params: dict  # the full request; send it back to run the same search again
+    result_count: int
+    created_at: datetime
+
+
+class SavedProduct(ProductSummary):
+    saved_at: datetime

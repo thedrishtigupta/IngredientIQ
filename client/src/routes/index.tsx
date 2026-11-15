@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { DataNote } from "@/components/DataNote";
+import { SearchBar } from "@/components/SearchBar";
 import { ErrorNotice } from "@/components/ErrorNotice";
 import { EvidenceList, SummaryNote } from "@/components/RecommendationExplanation";
 import { ProductGrid } from "@/components/ProductGrid";
@@ -40,6 +41,7 @@ const steps = [
 ];
 
 function Home() {
+  const navigate = useNavigate();
   const health = useHealth().data;
   const loved = useProducts("", 8);
   const example = useRecommend(toBody(WORKED_EXAMPLE.form, 1));
@@ -64,11 +66,15 @@ function Home() {
         </div>
 
         <div className="mt-14 max-w-3xl">
+          <SearchBar
+            placeholder="Search by product, brand or type"
+            onSubmit={(q) => void navigate({ to: "/explore", search: { q: q || undefined } })}
+          />
           <Link
             to="/explore"
-            className="inline-block border border-foreground px-6 py-3 text-xs uppercase tracking-[0.14em] transition-colors hover:bg-foreground hover:text-background"
+            className="mt-8 inline-block border border-foreground px-6 py-3 text-xs uppercase tracking-[0.14em] transition-colors hover:bg-foreground hover:text-background"
           >
-            Find products
+            Find products by goal
           </Link>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
             <span className="eyebrow">Try</span>

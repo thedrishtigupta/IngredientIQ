@@ -3,6 +3,7 @@ import type { ProductSummary } from "@/lib/api";
 import { fmtInt, fmtPrice, fmtRating } from "@/lib/labels";
 import { useCompare } from "@/lib/compare-store";
 import { ProductImage } from "./ProductImage";
+import { SaveButton } from "./SaveButton";
 
 type Props = {
   product: ProductSummary & { loves_count?: number | null };
@@ -73,7 +74,7 @@ export function ProductCard({ product, index = 0, rank, tags = [] }: Props) {
       <button
         type="button"
         onClick={() => toggle(product.product_id)}
-        className={`absolute right-3 top-3 border px-2.5 py-1 text-[0.62rem] uppercase tracking-[0.12em] transition-opacity ${
+        className={`absolute right-14 top-3 border px-2.5 py-1 text-[0.62rem] uppercase tracking-[0.12em] transition-opacity ${
           selected
             ? "border-foreground bg-foreground text-background opacity-100"
             : "border-border-strong bg-background/90 text-foreground opacity-0 focus:opacity-100 group-hover:opacity-100"
@@ -81,6 +82,7 @@ export function ProductCard({ product, index = 0, rank, tags = [] }: Props) {
       >
         {selected ? "In compare" : "Compare"}
       </button>
+      <SaveButton productId={product.product_id} className="absolute right-3 top-2" />
     </article>
   );
 }

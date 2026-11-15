@@ -116,7 +116,24 @@ def test_product_detail_and_similar(client):
 def test_search(client):
     found = client.get("/products?q=cream&limit=5").json()
     assert 0 < len(found) <= 5
-    assert all("cream" in (p["product_name"] + (p["brand"] or "")).lower() for p in found)
+    text = lambda p: " ".join(filter(None, [p["brand"], p["product_name"], p["category"], p["subcategory"]])).lower()
+    assert all("cream" in text(p) for p in found)
+
+
+@needs_db
+def test_search_matches_every_word_in_any_order(client):
+    found = client.get("/products", params={"q": "elephant drunk serum", "limit": 10}).json()
+    assert found
+    for p in found:
+        assert p["brand"] == "Drunk Elephant"
+        assert "serum" in (p["product_name"] + " " + (p["subcategory"] or "")).lower()
+
+
+@needs_db
+def test_search_treats_like_wildcards_literally(client):
+    found = client.get("/products", params={"q": "100%", "limit": 10}).json()
+    assert found and all("100%" in p["product_name"] for p in found)
+    assert client.get("/products", params={"q": "zzzz_no_such_product"}).json() == []
 
 
 @needs_db

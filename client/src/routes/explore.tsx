@@ -5,16 +5,40 @@ import { FilterPanel } from "@/components/FilterPanel";
 import { ProductCard } from "@/components/ProductCard";
 import { ExplanationPanel, SummaryNote } from "@/components/RecommendationExplanation";
 import { ScoreBreakdown } from "@/components/ScoreBreakdown";
-import { useCategories, useGoals, useRecommend, type RecommendBody } from "@/lib/api";
+import { SearchBar } from "@/components/SearchBar";
+import {
+  useAuth,
+  useCategories,
+  useGoals,
+  useProducts,
+  useRecommend,
+  type RecommendBody,
+} from "@/lib/api";
 import { humanize } from "@/lib/labels";
-import { emptyForm, PRESETS, toBody, type SearchForm } from "@/lib/search-form";
+import { emptyForm, fromParams, fromProfile, PRESETS, toBody, type SearchForm } from "@/lib/search-form";
 
-type Search = { preset?: string | undefined };
+/**
+ * URL state: `?q=` is the text search, `?preset=` opens with an example goal search,
+ * `?run=` (a saved /recommend body, from the search history) opens with that search filled in and run.
+ */
+type Search = {
+  preset?: string | undefined;
+  q?: string | undefined;
+  run?: Record<string, unknown> | undefined;
+};
+
+const TEXT_RESULTS = 24;
 
 export const Route = createFileRoute("/explore")({
-  validateSearch: (s: Record<string, unknown>): Search => ({
-    preset: typeof s["preset"] === "string" ? (s["preset"] as string) : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): Search => {
+    const q = typeof s["q"] === "string" ? s["q"].trim() : "";
+    const run = s["run"];
+    return {
+      preset: typeof s["preset"] === "string" ? (s["preset"] as string) : undefined,
+      q: q || undefined,
+      run: run && typeof run === "object" && !Array.isArray(run) ? (run as Record<string, unknown>) : undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Explore — IngredientIQ" },
@@ -34,17 +58,39 @@ export const Route = createFileRoute("/explore")({
 });
 
 function Explore() {
-  const { preset } = Route.useSearch();
-  const startForm = PRESETS.find((p) => p.id === preset)?.form ?? emptyForm;
+  const { preset, q = "", run: runParams } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const auth = useAuth();
+  const signedIn = !!auth.user;
+  const setQuery = (next: string) =>
+    void navigate({ search: (prev) => ({ ...prev, q: next || undefined }), replace: true });
+  // Wait until we know whether the user is signed in, so their search lands in their history.
+  const textResults = useProducts(q, TEXT_RESULTS, q !== "" && !auth.loading, null, signedIn);
+
+  const startForm = runParams
+    ? fromParams(runParams)
+    : (PRESETS.find((p) => p.id === preset)?.form ?? emptyForm);
 
   const [form, setForm] = useState<SearchForm>(startForm);
-  // The request that was sent (null until the first search). A preset link searches straight away.
-  const [submitted, setSubmitted] = useState<RecommendBody | null>(preset ? toBody(startForm) : null);
+  // The request that was sent (null until the first search). Preset and history links search straight away.
+  const [submitted, setSubmitted] = useState<RecommendBody | null>(
+    preset || runParams ? toBody(startForm) : null,
+  );
   const [openId, setOpenId] = useState<string | null>(null);
 
   const goals = useGoals();
   const categories = useCategories();
-  const rec = useRecommend(submitted);
+  const rec = useRecommend(
+    submitted && !auth.loading ? { ...submitted, record_history: signedIn } : null,
+  );
+  const profile = auth.user?.profile;
+  const hasProfile =
+    !!profile &&
+    (profile.goals.length > 0 ||
+      !!profile.max_price ||
+      !!profile.preferred_category ||
+      profile.fragrance_free ||
+      profile.avoided_ingredients.length > 0);
 
   const run = (f: SearchForm) => {
     const body = toBody(f);
@@ -64,7 +110,72 @@ function Explore() {
         Pick what you need. See what the evidence supports.
       </h1>
 
-      <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2">
+      <div className="mt-10 max-w-3xl">
+        <SearchBar
+          value={q}
+          placeholder="Search by product, brand or type, e.g. drunk elephant serum"
+          onSubmit={setQuery}
+          onClear={() => setQuery("")}
+          autoFocus={!preset}
+        />
+      </div>
+
+      {q ? (
+        <section aria-live="polite" className="mt-10">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <p className="numeric text-xs text-muted-foreground">
+              {textResults.isFetching || auth.loading
+                ? "Searching…"
+                : textResults.data
+                  ? `${textResults.data.length === TEXT_RESULTS ? `Top ${TEXT_RESULTS}` : textResults.data.length} ${
+                      textResults.data.length === 1 ? "product matches" : "products match"
+                    } “${q}” · most-loved first`
+                  : null}
+            </p>
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              className="link-underline text-xs uppercase tracking-[0.12em]"
+            >
+              Clear search
+            </button>
+          </div>
+
+          {textResults.error ? (
+            <div className="mt-6">
+              <ErrorNotice error={textResults.error} />
+            </div>
+          ) : textResults.data && !textResults.data.length ? (
+            <div className="mt-6 border border-dashed border-border-strong px-6 py-12 text-center">
+              <p className="display text-xl">No product matches “{q}”</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Check the spelling, use fewer words, or search by goal with the filters below.
+              </p>
+            </div>
+          ) : textResults.data ? (
+            <div className="mt-8 grid grid-cols-2 gap-x-5 gap-y-12 sm:gap-x-8 lg:grid-cols-4">
+              {textResults.data.map((p, i) => (
+                <ProductCard key={p.product_id} product={p} index={i} />
+              ))}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+
+      <div className={`${q ? "mt-16 border-t border-border pt-10" : "mt-8"} flex flex-wrap items-center gap-x-5 gap-y-2`}>
+        {hasProfile && profile ? (
+          <button
+            type="button"
+            onClick={() => {
+              const f = fromProfile(profile);
+              setForm(f);
+              run(f);
+            }}
+            className="border border-foreground px-3 py-1.5 text-xs uppercase tracking-[0.12em] transition-colors hover:bg-foreground hover:text-background"
+          >
+            Use my profile
+          </button>
+        ) : null}
         <span className="eyebrow">Try</span>
         {PRESETS.map((p) => (
           <button
@@ -94,7 +205,7 @@ function Explore() {
         </aside>
 
         <div>
-          {rec.isFetching && !data ? (
+          {(rec.isFetching || (submitted && auth.loading)) && !data ? (
             <div className="border border-dashed border-border-strong px-6 py-16 text-center">
               <p className="display text-xl">Ranking products…</p>
             </div>

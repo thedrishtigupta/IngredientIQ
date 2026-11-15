@@ -59,6 +59,8 @@ if ($existing -gt 0 -and -not $Force) {
 
 # 4. Migrations that are safe to re-run (CREATE ... IF NOT EXISTS)
 Get-Content sql\003_review_signals.sql -Raw | docker exec -i ingredientiq-db psql -U postgres -d ingredientiq -q -v ON_ERROR_STOP=1
+# Accounts (the API also creates these at startup)
+Get-Content sql\004_users.sql -Raw | docker exec -i ingredientiq-db psql -U postgres -d ingredientiq -q -v ON_ERROR_STOP=1
 
 # 5. Show what we have
 Write-Host ""

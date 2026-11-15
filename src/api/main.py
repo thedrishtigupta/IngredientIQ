@@ -11,8 +11,10 @@ import psycopg
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from psycopg.rows import dict_row
 
+from src.api import users
+from src.api.auth import current_user, optional_user
+from src.api.db import ensure_user_tables, get_repo, query, query_one
 from src.api.schemas import (
     Category,
     Goal,
@@ -56,6 +58,7 @@ async def lifespan(app):
         repo = ProductRepository()
         try:
             get_index(repo.connection)
+            ensure_user_tables(repo.connection)
         finally:
             repo.close()
     except psycopg.Error as e:
@@ -87,25 +90,7 @@ async def database_down(request: Request, exc: psycopg.OperationalError):
     )
 
 
-def get_repo():
-    """One repository (= one DB connection) per request, always closed afterwards."""
-    repo = ProductRepository()
-    try:
-        yield repo
-    finally:
-        repo.close()
-
-
-def query(repo, sql, params=()):
-    """Run a SELECT and return the rows as a list of dicts."""
-    with repo.connection.cursor(row_factory=dict_row) as cur:
-        cur.execute(sql, params)
-        return cur.fetchall()
-
-
-def query_one(repo, sql, params=()):
-    rows = query(repo, sql, params)
-    return rows[0] if rows else None
+app.include_router(users.router)
 
 
 # Columns shared by the light product lists (search, similar).
@@ -170,8 +155,38 @@ def categories(repo=Depends(get_repo)):
 # ---------- recommendations ----------
 
 @app.post("/recommend", response_model=RecommendResponse)
-def recommend(body: RecommendBody, repo=Depends(get_repo)):
-    """Rank products for the user's goals and filters, best first."""
+def recommend(body: RecommendBody, repo=Depends(get_repo), user=Depends(optional_user)):
+    """Rank products for the user's goals and filters, best first.
+    Signed in and `record_history: true`: the search is added to the user's history."""
+    response = run_recommend(body, repo)
+    if user and body.record_history:
+        params = body.model_dump(exclude={"explain", "record_history", "top_k"})
+        users.record_search(
+            repo, user["user_id"], "recommend", users.describe_recommend(params), params, response["count"]
+        )
+    return response
+
+
+@app.get("/me/recommendations", response_model=RecommendResponse, tags=["account"])
+def recommendations_for_me(
+    top_k: int = Query(8, ge=1, le=20), user=Depends(current_user), repo=Depends(get_repo)
+):
+    """Recommendations built from the signed-in user's profile (goals, budget, ingredients to avoid)."""
+    profile = users.load_profile(repo, user["user_id"])
+    excluded = list(profile.avoided_ingredients)
+    if profile.fragrance_free and "fragrance" not in excluded:
+        excluded.insert(0, "fragrance")
+    body = RecommendBody(
+        goals=profile.goals,
+        category=profile.preferred_category,
+        max_price=profile.max_price,
+        excluded_ingredients=excluded,
+        top_k=top_k,
+    )
+    return run_recommend(body, repo)
+
+
+def run_recommend(body: RecommendBody, repo) -> dict:
     engine = RecommendationEngine(repository=repo, vector_index=get_index(repo.connection))
     request = RecommendationRequest(
         category=body.category,
@@ -215,11 +230,29 @@ def search_products(
     q: str = Query("", description="Text to look for in the product name or brand"),
     category: str | None = None,
     limit: int = Query(20, ge=1, le=50),
+    record_history: bool = Query(False, description="Signed in: add this search to the user's history"),
     repo=Depends(get_repo),
+    user=Depends(optional_user),
 ):
-    """Simple text search. Most-loved products first."""
-    sql = f"SELECT {SUMMARY_COLUMNS} FROM products WHERE (product_name ILIKE %s OR brand ILIKE %s)"
-    params = [f"%{q}%", f"%{q}%"]
+    """Text search. Every word must appear in the brand, name, category or subcategory
+    (so "drunk elephant serum" works). Most-loved products first."""
+    rows = _search_products(repo, q, category, limit)
+    if user and record_history and q.strip():
+        users.record_search(
+            repo, user["user_id"], "text", q.strip(), {"q": q.strip(), "category": category}, len(rows)
+        )
+    return rows
+
+
+def _search_products(repo, q, category, limit):
+    sql = f"SELECT {SUMMARY_COLUMNS} FROM products WHERE TRUE"
+    params = []
+    haystack = "concat_ws(' ', brand, product_name, category, subcategory)"
+    for word in q.split()[:8]:  # cap the number of terms; more adds nothing useful
+        # Escape LIKE wildcards so "%" or "_" in the text are matched literally.
+        escaped = word.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        sql += f" AND {haystack} ILIKE %s"
+        params.append(f"%{escaped}%")
     if category:
         sql += " AND LOWER(category) = LOWER(%s)"
         params.append(category)

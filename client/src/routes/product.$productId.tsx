@@ -6,6 +6,7 @@ import { IngredientProfile } from "@/components/IngredientProfile";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductImage } from "@/components/ProductImage";
 import { ReviewInsights } from "@/components/ReviewInsights";
+import { SaveButton } from "@/components/SaveButton";
 import {
   ApiError,
   useProduct,
@@ -137,6 +138,7 @@ function ProductView({ product }: { product: Product }) {
           ) : null}
 
           <div className="mt-8 flex flex-wrap gap-3">
+            <SaveButton productId={product.product_id} variant="text" />
             <button
               type="button"
               onClick={() => toggle(product.product_id)}
