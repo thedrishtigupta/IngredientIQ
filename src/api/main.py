@@ -56,8 +56,15 @@ def get_index(conn):
 
 @asynccontextmanager
 async def lifespan(app):
-    # Build the index at startup. If the database is down, start anyway:
-    # the index is built on the first request that needs it.
+    # Render's liveness probe must not depend on Neon being reachable during a
+    # cold start. Production readiness is checked by /ready; the index is
+    # built lazily by the first request that needs it.
+    if is_production():
+        yield
+        return
+
+    # Build the index at startup locally. If the database is down, start
+    # anyway so local liveness/debugging remains possible.
     try:
         repo = ProductRepository()
         try:
@@ -127,7 +134,7 @@ def health():
     """Is the API up, can it reach the database, is an LLM key configured?"""
     try:
         repo = ProductRepository()
-    except psycopg.Error:
+    except (psycopg.Error, RuntimeError):
         return Health(status="degraded", db=False, llm_enabled=llm_enabled(), products=0)
     try:
         products = query_one(repo, "SELECT count(*) AS n FROM products")["n"]
@@ -161,7 +168,7 @@ def ready():
             query_one(repo, "SELECT 1")
         finally:
             repo.close()
-    except psycopg.Error:
+    except (psycopg.Error, RuntimeError):
         return JSONResponse(status_code=503, content={"status": "not_ready", "db": False})
     return {"status": "ready", "db": True}
 

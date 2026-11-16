@@ -1,6 +1,8 @@
 import pytest
+from fastapi.testclient import TestClient
 
 from src.api.config import allowed_origins, database_settings
+from src.api import main
 
 
 def test_local_configuration_has_safe_defaults(monkeypatch):
@@ -30,3 +32,24 @@ def test_database_url_is_not_logged_or_parsed_into_password(monkeypatch):
     settings = database_settings()
     assert settings.conninfo.startswith("postgresql://")
     assert settings.kwargs["connect_timeout"] == 5
+
+
+def test_production_startup_defers_database_work_to_readiness(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "production")
+
+    def unexpected_connection():
+        raise AssertionError("production startup must not connect to the database")
+
+    monkeypatch.setattr(main, "ProductRepository", unexpected_connection)
+    with TestClient(main.app) as client:
+        assert client.get("/live").json() == {"status": "ok"}
+
+
+def test_readiness_reports_missing_database_as_not_ready(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("PGHOST", raising=False)
+    with TestClient(main.app) as client:
+        response = client.get("/ready")
+    assert response.status_code == 503
+    assert response.json() == {"status": "not_ready", "db": False}
