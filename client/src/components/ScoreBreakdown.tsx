@@ -21,7 +21,7 @@ const PARTS = [
     field: "intent_score",
     label: "Product-type fit",
     needsGoal: true,
-    hint: "Whether this kind of product (moisturizer, cleanser, ...) suits the goal.",
+    hint: "Whether this kind of product (moisturizer, cleanser, …) suits the goal.",
   },
   {
     key: "review",
@@ -67,7 +67,7 @@ export function ScoreBreakdown({
       {compact ? null : (
         <div className="flex items-baseline justify-between">
           <p className="eyebrow">Computed recommendation score</p>
-          <p className="numeric text-2xl">{result.score.toFixed(2)}</p>
+          <p className="display text-gilded text-5xl">{result.score.toFixed(2)}</p>
         </div>
       )}
       <ul className={compact ? "space-y-2" : "mt-5 space-y-4"}>
@@ -84,13 +84,13 @@ export function ScoreBreakdown({
                   {!compact && weight !== undefined ? ` · w ${weight.toFixed(2)}` : ""}
                 </span>
               </div>
-              <div className="mt-1 h-[3px] w-full bg-muted">
+              <div className="bar-track mt-1.5" aria-hidden="true">
                 {value === null ? (
                   <div className="h-full w-full [background:repeating-linear-gradient(90deg,var(--color-border-strong)_0_4px,transparent_4px_8px)]" />
                 ) : (
-                  <div
-                    className="h-full bg-foreground transition-[width] duration-700 ease-out"
-                    style={{ width: `${Math.round(value * 100)}%` }}
+                  <span
+                    className="bar-scale bar-fill"
+                    style={{ "--v": Math.max(0, Math.min(1, value)) } as React.CSSProperties}
                   />
                 )}
               </div>

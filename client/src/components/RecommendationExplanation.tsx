@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { Recommendation } from "@/lib/api";
 import { humanize } from "@/lib/labels";
+import { useDialog } from "@/lib/use-dialog";
 import { IngredientBadge } from "./IngredientBadge";
 import { ReviewInsights } from "./ReviewInsights";
 import { ScoreBreakdown } from "./ScoreBreakdown";
@@ -17,10 +18,16 @@ export function EvidenceList({ result }: { result: Recommendation }) {
     <ul className="space-y-2.5">
       {items.map((i, idx) => (
         <li key={idx} className="flex gap-3 text-sm leading-relaxed">
-          <span className={`numeric mt-[1px] ${i.ok ? "text-olive" : "text-muted-foreground"}`}>
+          <span
+            aria-hidden="true"
+            className={`numeric mt-[2px] flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[0.65rem] ${i.ok ? "bg-olive/10 text-olive" : "bg-muted text-muted-foreground"}`}
+          >
             {i.ok ? "✓" : "—"}
           </span>
-          <span className={i.ok ? "" : "text-muted-foreground"}>{i.text}</span>
+          <span className={`min-w-0 break-words ${i.ok ? "" : "text-muted-foreground"}`}>
+            <span className="sr-only">{i.ok ? "Strength: " : "Weakness: "}</span>
+            {i.text}
+          </span>
         </li>
       ))}
     </ul>
@@ -52,28 +59,38 @@ export function ExplanationPanel({
   onClose: () => void;
 }) {
   const matched = result.matched_ingredients;
+  const ref = useDialog<HTMLDivElement>(true, onClose);
+  const titleId = `why-${result.product_id}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        aria-label="Close explanation"
-        onClick={onClose}
-        className="absolute inset-0 bg-foreground/25"
-      />
-      <div className="relative flex h-full w-full max-w-[520px] flex-col overflow-y-auto border-l border-border bg-paper rise">
-        <div className="sticky top-0 flex items-start justify-between gap-6 border-b border-border bg-paper px-6 py-5">
+    <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+      {/* Pointer-only backdrop: keyboard users close with Escape or the panel's own button. */}
+      <div aria-hidden="true" onClick={onClose} className="sheet-fade absolute inset-0 bg-ink/45 backdrop-blur-[3px]" />
+      <div
+        ref={ref}
+        tabIndex={-1}
+        className="sheet-in relative flex h-full w-full max-w-[540px] flex-col overflow-y-auto overscroll-contain border-l border-border bg-paper pb-[env(safe-area-inset-bottom)] shadow-2xl focus:outline-none"
+      >
+        <div className="glass sticky top-0 z-10 flex items-start justify-between gap-6 border-b border-border px-7 py-6">
           <div>
-            <p className="eyebrow">Why this product</p>
+            <p className="eyebrow-gold">Why this product</p>
             <p className="mt-1.5 text-sm text-muted-foreground">{result.brand}</p>
-            <h2 className="display text-2xl">{result.product_name}</h2>
+            <h2 id={titleId} className="display break-words text-3xl">
+              {result.product_name}
+            </h2>
           </div>
-          <button type="button" onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">
-            Close
+          <button
+            type="button"
+            data-autofocus
+            onClick={onClose}
+            aria-label="Close explanation"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-[background-color,color,transform] duration-150 hover:bg-foreground hover:text-background active:scale-95"
+          >
+            <span aria-hidden="true">✕</span>
           </button>
         </div>
 
-        <div className="space-y-10 px-6 py-8">
+        <div className="space-y-10 px-7 py-8">
           <section>
             <p className="eyebrow">Summary</p>
             <p className="mt-4 text-sm leading-relaxed">{result.explanation?.summary ?? "No summary available."}</p>
@@ -126,7 +143,7 @@ export function ExplanationPanel({
               params={{ productId: result.product_id }}
               className="link-underline text-sm"
             >
-              Open the full product page →
+              Open the full product page <span aria-hidden="true" className="arrow">→</span>
             </Link>
           </section>
         </div>

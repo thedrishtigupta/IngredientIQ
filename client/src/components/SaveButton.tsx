@@ -48,11 +48,7 @@ export function SaveButton({ productId, variant = "icon", className = "" }: Prop
         type="button"
         onClick={onClick}
         aria-pressed={shown}
-        className={`inline-flex items-center gap-2 border px-4 py-2 text-xs uppercase tracking-[0.14em] transition-colors ${
-          shown
-            ? "border-foreground bg-foreground text-background"
-            : "border-foreground text-foreground hover:bg-foreground hover:text-background"
-        } ${className}`}
+        className={`btn ${shown ? "btn-primary" : "btn-outline"} ${className}`}
       >
         <Heart filled={shown} />
         {label}
@@ -67,7 +63,7 @@ export function SaveButton({ productId, variant = "icon", className = "" }: Prop
       aria-pressed={shown}
       aria-label={shown ? "Remove from saved" : "Save product"}
       title={shown ? "Remove from saved" : "Save"}
-      className={`flex h-9 w-9 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-foreground hover:text-background ${
+      className={`flex h-9 w-9 items-center justify-center rounded-full bg-background/85 text-foreground shadow-md backdrop-blur transition-[background-color,color,transform] duration-150 active:scale-95 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-background ${
         shown ? "text-accent" : ""
       } ${className}`}
     >

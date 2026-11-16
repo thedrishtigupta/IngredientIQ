@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ApiError, useAuth, useSignIn } from "@/lib/api";
 
 type Search = { mode?: "register" | undefined; redirect?: string | undefined };
@@ -17,8 +17,7 @@ export const Route = createFileRoute("/login")({
   component: Login,
 });
 
-const input =
-  "mt-2 w-full border border-border bg-transparent px-3 py-2.5 text-sm focus:border-foreground focus:outline-none";
+const input = "field mt-2";
 
 function Login() {
   const { mode, redirect } = Route.useSearch();
@@ -37,15 +36,21 @@ function Login() {
   }, [user, redirect, navigate]);
 
   const error = signIn.error;
+  const errorRef = useRef<HTMLParagraphElement>(null);
+  // Move focus to the error after a failed attempt, so it is read out and seen.
+  useEffect(() => {
+    if (signIn.isError) errorRef.current?.focus();
+  }, [signIn.isError]);
   const message =
     error instanceof ApiError && error.status === null
       ? "The IngredientIQ API is not responding. Start it and try again."
       : error?.message;
 
   return (
-    <div className="mx-auto max-w-[440px] px-5 py-16 sm:py-24">
-      <p className="eyebrow">{registering ? "Create an account" : "Welcome back"}</p>
-      <h1 className="display mt-4 text-4xl">{registering ? "Create your account" : "Sign in"}</h1>
+    <div className="mx-auto max-w-[480px] px-5 py-16 sm:py-24">
+      <div className="card-lux rise p-8 sm:p-10">
+      <p className="eyebrow-gold">{registering ? "Create an account" : "Welcome back"}</p>
+      <h1 className="display mt-5 text-5xl">{registering ? "Create your account" : "Sign in"}</h1>
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
         {registering
           ? "Save your skin profile, keep your search history and bookmark products."
@@ -64,6 +69,7 @@ function Login() {
             <span className="eyebrow">Name</span>
             <input
               required
+              name="name"
               maxLength={60}
               autoComplete="nickname"
               value={name}
@@ -77,7 +83,13 @@ function Login() {
           <input
             required
             type="email"
+            name="email"
+            inputMode="email"
             autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
+            aria-invalid={message ? true : undefined}
+            aria-describedby={message ? "login-error" : undefined}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={input}
@@ -88,19 +100,28 @@ function Login() {
           <input
             required
             type="password"
+            name="password"
             minLength={registering ? 8 : undefined}
+            aria-invalid={message ? true : undefined}
+            aria-describedby={[registering ? "password-hint" : "", message ? "login-error" : ""].filter(Boolean).join(" ") || undefined}
             autoComplete={registering ? "new-password" : "current-password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className={input}
           />
           {registering ? (
-            <span className="mt-1.5 block text-xs text-muted-foreground">At least 8 characters.</span>
+            <span id="password-hint" className="mt-1.5 block text-xs text-muted-foreground">At least 8 characters.</span>
           ) : null}
         </label>
 
         {message ? (
-          <p role="alert" className="border-l-2 border-accent pl-3 text-sm text-foreground">
+          <p
+            id="login-error"
+            ref={errorRef}
+            tabIndex={-1}
+            role="alert"
+            className="rounded-xl border border-accent/30 bg-accent/5 px-4 py-3 text-sm text-foreground focus:outline-none"
+          >
             {message}
           </p>
         ) : null}
@@ -108,8 +129,10 @@ function Login() {
         <button
           type="submit"
           disabled={signIn.isPending}
-          className="w-full border border-foreground bg-foreground px-5 py-3 text-xs uppercase tracking-[0.14em] text-background transition-opacity hover:opacity-85 disabled:opacity-50"
+          aria-busy={signIn.isPending}
+          className="btn btn-primary w-full"
         >
+          {signIn.isPending ? <span className="spinner" aria-hidden="true" /> : null}
           {signIn.isPending ? "One moment…" : registering ? "Create account" : "Sign in"}
         </button>
       </form>
@@ -120,11 +143,12 @@ function Login() {
           to="/login"
           search={{ mode: registering ? undefined : "register", redirect }}
           onClick={() => signIn.reset()}
-          className="link-underline text-foreground"
+          className="link-underline py-1 text-foreground"
         >
           {registering ? "Sign in" : "Create an account"}
         </Link>
       </p>
+      </div>
     </div>
   );
 }

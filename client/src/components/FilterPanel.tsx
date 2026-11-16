@@ -1,5 +1,7 @@
+import { Spinner } from "./Skeleton";
 import type { Category, Goal } from "@/lib/api";
 import type { SearchForm } from "@/lib/search-form";
+import { fmtBudget } from "@/lib/labels";
 
 type Props = {
   form: SearchForm;
@@ -12,15 +14,8 @@ type Props = {
 
 const toggle = <T,>(arr: T[], v: T) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
 
-const chip = (active: boolean) =>
-  `border px-3 py-1.5 text-xs transition-colors ${
-    active
-      ? "border-foreground bg-foreground text-background"
-      : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
-  }`;
 
-const input =
-  "mt-3 w-full border border-border bg-transparent px-3 py-2 text-sm focus:border-foreground focus:outline-none";
+const input = "field mt-3";
 
 /** The structured search form. "Find products" sends it to POST /recommend (see Explore). */
 export function FilterPanel({ form, onChange, onSubmit, busy, goals, categories }: Props) {
@@ -37,9 +32,9 @@ export function FilterPanel({ form, onChange, onSubmit, busy, goals, categories 
         onSubmit();
       }}
     >
-      <section>
-        <p className="eyebrow">Goals</p>
-        <div className="mt-3 flex flex-wrap gap-1.5">
+      <fieldset>
+        <legend className="eyebrow">Goals</legend>
+        <div className="mt-3 flex flex-wrap gap-1.5" aria-busy={!goals}>
           {goals ? (
             goals.map((g) => (
               <button
@@ -47,7 +42,7 @@ export function FilterPanel({ form, onChange, onSubmit, busy, goals, categories 
                 type="button"
                 onClick={() => onChange({ ...form, goals: toggle(form.goals, g.id) })}
                 aria-pressed={form.goals.includes(g.id)}
-                className={chip(form.goals.includes(g.id))}
+                className="chip"
               >
                 {g.label}
               </button>
@@ -59,11 +54,11 @@ export function FilterPanel({ form, onChange, onSubmit, busy, goals, categories 
         <p className="mt-2 text-xs text-muted-foreground">
           Pick none to rank on rating, popularity and reviews only.
         </p>
-      </section>
+      </fieldset>
 
-      <section>
-        <p className="eyebrow">Category</p>
-        <div className="mt-3 flex flex-wrap gap-1.5">
+      <fieldset>
+        <legend className="eyebrow">Category</legend>
+        <div className="mt-3 flex flex-wrap gap-1.5" aria-busy={!categories}>
           {categories ? (
             categories.map((c) => (
               <button
@@ -77,7 +72,7 @@ export function FilterPanel({ form, onChange, onSubmit, busy, goals, categories 
                   })
                 }
                 aria-pressed={form.category === c.category}
-                className={chip(form.category === c.category)}
+                className="chip"
               >
                 {c.category}
               </button>
@@ -89,6 +84,7 @@ export function FilterPanel({ form, onChange, onSubmit, busy, goals, categories 
         {subcategories.length ? (
           <select
             aria-label="Subcategory"
+            name="subcategory"
             value={form.subcategory ?? ""}
             onChange={(e) => onChange({ ...form, subcategory: e.target.value || null })}
             className={input}
@@ -101,65 +97,78 @@ export function FilterPanel({ form, onChange, onSubmit, busy, goals, categories 
             ))}
           </select>
         ) : null}
-      </section>
+      </fieldset>
 
-      <section>
+      <fieldset>
         <div className="flex items-baseline justify-between">
-          <p className="eyebrow">Budget</p>
-          <p className="numeric text-xs">{form.maxPrice ? `Up to $${form.maxPrice}` : "Any"}</p>
+          <legend className="eyebrow float-left">Budget</legend>
+          <p className="numeric text-xs" aria-hidden="true">
+            {form.maxPrice ? `Up to ${fmtBudget(form.maxPrice)}` : "Any"}
+          </p>
         </div>
         <input
           type="range"
+          name="max_price"
           aria-label="Maximum price"
+          aria-valuetext={form.maxPrice ? `Up to ${fmtBudget(form.maxPrice)}` : "Any price"}
           min={10}
           max={200}
           step={5}
           value={form.maxPrice ?? 200}
           onChange={(e) => onChange({ ...form, maxPrice: Number(e.target.value) })}
-          className="mt-3 w-full accent-[var(--color-accent)]"
+          style={{ "--fill": `${(((form.maxPrice ?? 200) - 10) / 190) * 100}%` } as React.CSSProperties}
+          className="mt-4 w-full"
         />
         <button
           type="button"
           onClick={() => onChange({ ...form, maxPrice: null })}
-          className="mt-2 text-xs text-muted-foreground link-underline"
+          className="link-underline mt-2 py-1 text-xs text-muted-foreground"
         >
           Clear budget
         </button>
-      </section>
+      </fieldset>
 
-      <section>
-        <p className="eyebrow">Ingredients</p>
-        <label className="mt-3 flex cursor-pointer items-center gap-3 text-sm">
+      <fieldset>
+        <legend className="eyebrow">Ingredients</legend>
+        <label className="mt-2 flex min-h-11 cursor-pointer select-none items-center gap-3 text-sm">
           <input
             type="checkbox"
             checked={form.fragranceFree}
             onChange={() => onChange({ ...form, fragranceFree: !form.fragranceFree })}
-            className="h-3.5 w-3.5 accent-[var(--color-accent)]"
+            className="h-4 w-4 rounded accent-[var(--color-accent)]"
           />
           Fragrance-free
         </label>
         <input
           aria-label="Must contain"
+          name="must_contain"
+          autoComplete="off"
+          spellCheck={false}
           value={form.required}
           onChange={(e) => onChange({ ...form, required: e.target.value })}
-          placeholder="Must contain, e.g. niacinamide"
+          placeholder="Must contain, e.g. niacinamide…"
           className={input}
         />
         <input
           aria-label="Must not contain"
+          name="must_not_contain"
+          autoComplete="off"
+          spellCheck={false}
           value={form.excluded}
           onChange={(e) => onChange({ ...form, excluded: e.target.value })}
-          placeholder="Must not contain, e.g. alcohol"
+          placeholder="Must not contain, e.g. alcohol…"
           className={input}
         />
         <p className="mt-2 text-xs text-muted-foreground">Separate several names with commas.</p>
-      </section>
+      </fieldset>
 
       <button
         type="submit"
         disabled={busy}
-        className="w-full border border-foreground px-5 py-3 text-xs uppercase tracking-[0.14em] transition-colors hover:bg-foreground hover:text-background disabled:opacity-50"
+        aria-busy={busy}
+        className="btn btn-primary w-full"
       >
+        {busy ? <Spinner /> : null}
         {busy ? "Finding…" : "Find products"}
       </button>
     </form>

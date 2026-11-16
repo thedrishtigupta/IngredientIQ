@@ -20,35 +20,40 @@ export function ProductCard({ product, index = 0, rank, tags = [] }: Props) {
   const name = `${product.brand ?? ""} ${product.product_name}`.trim();
 
   return (
-    <article className="group relative">
-      <Link
-        to="/product/$productId"
-        params={{ productId: product.product_id }}
-        className="block"
-        aria-label={name}
-      >
-        <ProductImage
-          id={product.product_id}
-          alt={name}
-          eager={index < 3}
-          className="aspect-[4/5] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
-        />
-        <div className="mt-4">
-          <p className="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground">
+    <article className="group relative min-w-0">
+      <Link to="/product/$productId" params={{ productId: product.product_id }} className="block rounded-[1.25rem]">
+        <div className="overflow-hidden rounded-[1.25rem] shadow-[var(--shadow-soft)] ring-1 ring-border/60 transition-shadow duration-300 group-hover:shadow-[var(--shadow-lift)]">
+          <ProductImage
+            id={product.product_id}
+            alt={name}
+            eager={index < 3}
+            className="zoom aspect-[4/5] w-full object-cover"
+          />
+        </div>
+        <div className="mt-4 px-0.5">
+          <p className="truncate text-[0.66rem] font-medium uppercase tracking-[0.2em] text-accent">
             {product.brand ?? "Unknown brand"}
           </p>
-          <h3 className="mt-1.5 text-[0.98rem] leading-snug text-foreground">{product.product_name}</h3>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <h3 className="display mt-1.5 line-clamp-2 break-words text-[1.3rem] leading-[1.15] text-foreground">
+            <span className="link-underline">{product.product_name}</span>
+          </h3>
+          <p className="mt-1 truncate text-xs text-muted-foreground">
             {[product.category, product.subcategory].filter(Boolean).join(" · ")}
           </p>
-          <div className="mt-3 flex items-baseline justify-between border-t border-border pt-3">
-            <span className="numeric text-sm">{fmtPrice(product.price)}</span>
+          <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-border pt-3">
+            <span className="numeric text-sm font-medium">{fmtPrice(product.price)}</span>
             <span className="numeric text-xs text-muted-foreground">
-              {fmtRating(product.rating)} ★ · {fmtInt(product.review_count ?? 0)} reviews
+              <span aria-hidden="true" className="text-gold">
+                ★
+              </span>
+              <span className="sr-only">Rating </span>
+              {fmtRating(product.rating)} · {fmtInt(product.review_count ?? 0)}
+              <span className="sr-only"> reviews</span>
             </span>
           </div>
           {product.loves_count != null ? (
             <p className="numeric mt-1 text-[0.7rem] text-muted-foreground">
+              <span aria-hidden="true">♡ </span>
               {fmtInt(product.loves_count)} loves
             </p>
           ) : null}
@@ -57,7 +62,7 @@ export function ProductCard({ product, index = 0, rank, tags = [] }: Props) {
               {tags.slice(0, 3).map((t) => (
                 <span
                   key={t}
-                  className="border border-border px-2 py-0.5 text-[0.62rem] uppercase tracking-[0.1em] text-muted-foreground"
+                  className="rounded-full bg-gold-soft/60 px-2.5 py-0.5 text-[0.62rem] uppercase tracking-[0.12em] text-foreground/75"
                 >
                   {t}
                 </span>
@@ -67,22 +72,30 @@ export function ProductCard({ product, index = 0, rank, tags = [] }: Props) {
         </div>
       </Link>
       {rank !== undefined ? (
-        <span className="numeric pointer-events-none absolute left-3 top-3 bg-foreground px-2.5 py-1 text-xs text-background">
-          #{rank}
+        <span
+          className={`numeric pointer-events-none absolute left-3 top-3 flex h-9 min-w-9 items-center justify-center rounded-full px-2 text-xs shadow-md ${
+            rank === 1 ? "btn-gold" : "bg-ink/85 text-ink-foreground backdrop-blur"
+          }`}
+        >
+          <span className="sr-only">Rank </span>
+          {rank}
         </span>
       ) : null}
+      {/* Always visible on touch; on a fine pointer it appears on hover or keyboard focus. */}
       <button
         type="button"
         onClick={() => toggle(product.product_id)}
-        className={`absolute right-14 top-3 border px-2.5 py-1 text-[0.62rem] uppercase tracking-[0.12em] transition-opacity ${
+        aria-pressed={selected}
+        aria-label={selected ? `Remove ${name} from comparison` : `Add ${name} to comparison`}
+        className={`absolute right-14 top-3 flex h-9 items-center rounded-full px-3 text-[0.6rem] uppercase tracking-[0.14em] shadow-sm backdrop-blur transition-[opacity,background-color,color,transform] duration-150 active:scale-95 ${
           selected
-            ? "border-foreground bg-foreground text-background opacity-100"
-            : "border-border-strong bg-background/90 text-foreground opacity-0 focus:opacity-100 group-hover:opacity-100"
+            ? "bg-foreground text-background"
+            : "bg-background/85 text-foreground [@media(hover:hover)_and_(pointer:fine)]:opacity-0 [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100 focus-visible:opacity-100"
         }`}
       >
-        {selected ? "In compare" : "Compare"}
+        <span aria-hidden="true">{selected ? "✓ Comparing" : "+ Compare"}</span>
       </button>
-      <SaveButton productId={product.product_id} className="absolute right-3 top-2" />
+      <SaveButton productId={product.product_id} className="absolute right-3 top-3" />
     </article>
   );
 }

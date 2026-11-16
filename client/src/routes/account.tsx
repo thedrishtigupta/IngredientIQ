@@ -1,5 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { formatDistanceToNow } from "date-fns";
+import { createFileRoute, Link, useBlocker, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ErrorNotice } from "@/components/ErrorNotice";
 import { ProductCard } from "@/components/ProductCard";
@@ -18,7 +17,8 @@ import {
   type Me,
   type Profile,
 } from "@/lib/api";
-import { humanize } from "@/lib/labels";
+import { fmtBudget, fmtRelative, humanize } from "@/lib/labels";
+import { LinesSkeleton, ProductGridSkeleton } from "@/components/Skeleton";
 
 const TABS = [
   { id: "for-you", label: "For you" },
@@ -43,17 +43,24 @@ function Account() {
   const navigate = useNavigate();
 
   if (loading) {
-    return <div className="mx-auto max-w-[1220px] px-5 py-24 text-sm text-muted-foreground sm:px-8">Loading…</div>;
+    return (
+      <div className="mx-auto max-w-[1280px] px-5 py-12 sm:px-8">
+        <LinesSkeleton lines={1} label="Loading your account…" className="max-w-32" />
+        <div aria-hidden="true" className="shimmer mt-6 h-14 w-1/2 rounded-2xl" />
+        <div aria-hidden="true" className="shimmer mt-10 h-11 w-80 max-w-full rounded-full" />
+        <ProductGridSkeleton count={4} label="" className="mt-10 grid grid-cols-2 gap-x-5 gap-y-12 sm:gap-x-8 lg:grid-cols-4" />
+      </div>
+    );
   }
   if (!user) {
     return (
-      <div className="mx-auto max-w-[1220px] px-5 py-16 sm:px-8">
+      <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8">
         {error ? (
           <ErrorNotice error={error} />
         ) : (
           <div className="max-w-lg">
-            <p className="eyebrow">My account</p>
-            <h1 className="display mt-4 text-4xl">Sign in to see your profile</h1>
+            <p className="eyebrow-gold">My account</p>
+            <h1 className="display mt-5 text-4xl">Sign in to see your profile</h1>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               Your search history, saved products and recommendations based on your skin profile live here.
             </p>
@@ -61,14 +68,14 @@ function Account() {
               <Link
                 to="/login"
                 search={{ redirect: "/account" }}
-                className="border border-foreground bg-foreground px-6 py-3 text-xs uppercase tracking-[0.14em] text-background hover:opacity-85"
+                className="btn btn-primary"
               >
                 Sign in
               </Link>
               <Link
                 to="/login"
                 search={{ mode: "register", redirect: "/account" }}
-                className="border border-foreground px-6 py-3 text-xs uppercase tracking-[0.14em] hover:bg-foreground hover:text-background"
+                className="btn btn-outline"
               >
                 Create account
               </Link>
@@ -80,12 +87,12 @@ function Account() {
   }
 
   return (
-    <div className="mx-auto max-w-[1220px] px-5 py-12 sm:px-8">
+    <div className="mx-auto max-w-[1280px] px-5 py-12 sm:px-8">
       <div className="flex flex-wrap items-end justify-between gap-6">
         <div>
-          <p className="eyebrow">My account</p>
-          <h1 className="display mt-4 text-4xl sm:text-5xl">Hello, {user.display_name}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="eyebrow-gold">My account</p>
+          <h1 className="display mt-5 break-words text-5xl sm:text-6xl">Hello, {user.display_name}</h1>
+          <p className="mt-2 break-all text-sm text-muted-foreground sm:break-normal">
             {user.email}
             {user.profile.skin_type ? ` · ${humanize(user.profile.skin_type)} skin` : ""}
           </p>
@@ -93,13 +100,14 @@ function Account() {
         <button
           type="button"
           onClick={() => signOut.mutate(undefined, { onSettled: () => void navigate({ to: "/" }) })}
-          className="link-underline text-xs uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground"
+          disabled={signOut.isPending}
+          className="link-underline py-1 text-xs uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           Sign out
         </button>
       </div>
 
-      <nav className="mt-10 flex gap-6 overflow-x-auto border-b border-border" aria-label="Account sections">
+      <nav className="mt-10 inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-border bg-paper/70 p-1" aria-label="Account sections">
         {TABS.map((t) => (
           <Link
             key={t.id}
@@ -107,10 +115,8 @@ function Account() {
             search={{ tab: t.id === "for-you" ? undefined : t.id }}
             replace
             aria-current={tab === t.id ? "page" : undefined}
-            className={`-mb-px shrink-0 whitespace-nowrap border-b-2 pb-3 text-sm transition-colors ${
-              tab === t.id
-                ? "border-foreground text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
+            className={`flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-5 py-2 text-sm transition-colors duration-150 ${
+              tab === t.id ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {t.label}
@@ -152,7 +158,7 @@ function ForYou({ user }: { user: Me }) {
             {p.goals.length ? p.goals.map(humanize).join(", ") : "any goal"}
           </span>
           {p.preferred_category ? ` in ${p.preferred_category}` : ""}
-          {p.max_price ? `, under $${p.max_price}` : ""}
+          {p.max_price ? `, under ${fmtBudget(p.max_price)}` : ""}
           {p.fragrance_free ? ", fragrance-free" : ""}
           {p.avoided_ingredients.filter((x) => x !== "fragrance").length
             ? `, without ${p.avoided_ingredients.filter((x) => x !== "fragrance").join(", ")}`
@@ -166,7 +172,7 @@ function ForYou({ user }: { user: Me }) {
 
       <div className="mt-10">
         {rec.isPending ? (
-          <p className="text-sm text-muted-foreground">Finding products for you…</p>
+          <ProductGridSkeleton count={4} label="Finding products for you…" />
         ) : rec.error ? (
           <ErrorNotice error={rec.error} />
         ) : !rec.data.results.length ? (
@@ -193,7 +199,7 @@ function History() {
   const history = useHistory(100);
   const del = useDeleteHistory();
 
-  if (history.isPending) return <p className="text-sm text-muted-foreground">Loading your searches…</p>;
+  if (history.isPending) return <LinesSkeleton lines={5} label="Loading your searches…" className="max-w-3xl" />;
   if (history.error) return <ErrorNotice error={history.error} />;
   if (!history.data.length) {
     return (
@@ -217,14 +223,20 @@ function History() {
           onClick={() => {
             if (window.confirm("Delete your whole search history?")) del.mutate(null);
           }}
-          className="link-underline text-xs uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground disabled:opacity-50"
+          className="link-underline py-1 text-xs uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           Clear history
         </button>
       </div>
       <ul className="mt-6 divide-y divide-border border-y border-border">
         {history.data.map((h) => (
-          <HistoryRow key={h.search_id} item={h} onDelete={() => del.mutate(h.search_id)} />
+          <HistoryRow
+            key={h.search_id}
+            item={h}
+            onDelete={() => {
+              if (window.confirm(`Delete “${h.query}” from your search history?`)) del.mutate(h.search_id);
+            }}
+          />
         ))}
       </ul>
     </section>
@@ -232,14 +244,14 @@ function History() {
 }
 
 function HistoryRow({ item, onDelete }: { item: HistoryItem; onDelete: () => void }) {
-  const when = formatDistanceToNow(new Date(item.created_at), { addSuffix: true });
+  const when = fmtRelative(item.created_at);
   const again =
     item.kind === "text" ? (
-      <Link to="/explore" search={{ q: item.query }} className="link-underline text-xs uppercase tracking-[0.12em]">
+      <Link to="/explore" search={{ q: item.query }} className="link-underline py-1 text-xs uppercase tracking-[0.12em]">
         Search again
       </Link>
     ) : (
-      <Link to="/explore" search={{ run: item.params }} className="link-underline text-xs uppercase tracking-[0.12em]">
+      <Link to="/explore" search={{ run: item.params }} className="link-underline py-1 text-xs uppercase tracking-[0.12em]">
         Run again
       </Link>
     );
@@ -250,7 +262,10 @@ function HistoryRow({ item, onDelete }: { item: HistoryItem; onDelete: () => voi
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm text-foreground">{item.query}</p>
         <p className="numeric mt-0.5 text-xs text-muted-foreground">
-          {item.result_count} {item.result_count === 1 ? "result" : "results"} · {when}
+          {item.result_count} {item.result_count === 1 ? "result" : "results"} ·{" "}
+          <time dateTime={item.created_at} title={new Date(item.created_at).toLocaleString("en-US")} suppressHydrationWarning>
+            {when}
+          </time>
         </p>
       </div>
       <div className="flex items-center gap-5">
@@ -258,10 +273,10 @@ function HistoryRow({ item, onDelete }: { item: HistoryItem; onDelete: () => voi
         <button
           type="button"
           onClick={onDelete}
-          aria-label={`Delete "${item.query}" from history`}
-          className="text-lg leading-none text-muted-foreground hover:text-foreground"
+          aria-label={`Delete “${item.query}” from history`}
+          className="flex h-9 w-9 items-center justify-center rounded-full text-lg leading-none text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground active:scale-95"
         >
-          ×
+          <span aria-hidden="true">×</span>
         </button>
       </div>
     </li>
@@ -272,7 +287,7 @@ function HistoryRow({ item, onDelete }: { item: HistoryItem; onDelete: () => voi
 
 function Saved() {
   const saved = useSaved();
-  if (saved.isPending) return <p className="text-sm text-muted-foreground">Loading saved products…</p>;
+  if (saved.isPending) return <ProductGridSkeleton count={4} label="Loading saved products…" />;
   if (saved.error) return <ErrorNotice error={saved.error} />;
   if (!saved.data.length) {
     return (
@@ -303,12 +318,6 @@ const SUGGESTED_GOALS: Record<string, string[]> = {
   sensitive: ["soothing", "barrier_support"],
 };
 
-const chip = (active: boolean) =>
-  `border px-3 py-1.5 text-xs transition-colors ${
-    active
-      ? "border-foreground bg-foreground text-background"
-      : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
-  }`;
 
 const toggle = <T,>(arr: T[], v: T) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
 
@@ -321,6 +330,16 @@ function ProfileForm({ user }: { user: Me }) {
   const [avoid, setAvoid] = useState(user.profile.avoided_ingredients.join(", "));
   const [savedAt, setSavedAt] = useState<number | null>(null);
   useEffect(() => setSavedAt(null), [p, avoid]); // any edit hides "Saved"
+
+  // Warn before leaving (tab switch, link, reload, close) with unsaved edits.
+  const dirty =
+    savedAt === null &&
+    (JSON.stringify(p) !== JSON.stringify(user.profile) || avoid !== user.profile.avoided_ingredients.join(", "));
+  useBlocker({
+    shouldBlockFn: () => !window.confirm("Your profile has unsaved changes. Leave without saving?"),
+    enableBeforeUnload: dirty,
+    disabled: !dirty || update.isPending,
+  });
 
   const suggestions = p.skin_type ? (SUGGESTED_GOALS[p.skin_type] ?? []) : [];
   const missing = suggestions.filter((g) => !p.goals.includes(g));
@@ -341,8 +360,8 @@ function ProfileForm({ user }: { user: Me }) {
         submit();
       }}
     >
-      <section>
-        <p className="eyebrow">Skin type</p>
+      <fieldset>
+        <legend className="eyebrow">Skin type</legend>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {SKIN_TYPES.map((s) => (
             <button
@@ -350,7 +369,7 @@ function ProfileForm({ user }: { user: Me }) {
               type="button"
               aria-pressed={p.skin_type === s}
               onClick={() => setP({ ...p, skin_type: p.skin_type === s ? null : s })}
-              className={chip(p.skin_type === s)}
+              className="chip"
             >
               {humanize(s)}
             </button>
@@ -375,10 +394,10 @@ function ProfileForm({ user }: { user: Me }) {
             </button>
           </p>
         ) : null}
-      </section>
+      </fieldset>
 
-      <section>
-        <p className="eyebrow">Goals</p>
+      <fieldset>
+        <legend className="eyebrow">Goals</legend>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {goals.data ? (
             goals.data.map((g) => (
@@ -387,7 +406,7 @@ function ProfileForm({ user }: { user: Me }) {
                 type="button"
                 aria-pressed={p.goals.includes(g.id)}
                 onClick={() => setP({ ...p, goals: toggle(p.goals, g.id) })}
-                className={chip(p.goals.includes(g.id))}
+                className="chip"
               >
                 {g.label}
               </button>
@@ -396,11 +415,12 @@ function ProfileForm({ user }: { user: Me }) {
             <span className="text-xs text-muted-foreground">Loading goals…</span>
           )}
         </div>
-      </section>
+      </fieldset>
 
-      <section>
-        <p className="eyebrow">Usual category</p>
+      <fieldset>
+        <legend className="eyebrow">Usual category</legend>
         <div className="mt-3 flex flex-wrap gap-1.5">
+          {categories.isPending ? <span className="text-xs text-muted-foreground">Loading categories…</span> : null}
           {categories.data?.map((c) => (
             <button
               key={c.category}
@@ -409,74 +429,87 @@ function ProfileForm({ user }: { user: Me }) {
               onClick={() =>
                 setP({ ...p, preferred_category: p.preferred_category === c.category ? null : c.category })
               }
-              className={chip(p.preferred_category === c.category)}
+              className="chip"
             >
               {c.category}
             </button>
           ))}
         </div>
-      </section>
+      </fieldset>
 
-      <section className="max-w-sm">
+      <fieldset className="max-w-sm">
         <div className="flex items-baseline justify-between">
-          <p className="eyebrow">Budget</p>
-          <p className="numeric text-xs">{p.max_price ? `Up to $${p.max_price}` : "Any"}</p>
+          <legend className="eyebrow float-left">Budget</legend>
+          <p className="numeric text-xs" aria-hidden="true">
+            {p.max_price ? `Up to ${fmtBudget(p.max_price)}` : "Any"}
+          </p>
         </div>
         <input
           type="range"
+          name="max_price"
           aria-label="Maximum price"
+          aria-valuetext={p.max_price ? `Up to ${fmtBudget(p.max_price)}` : "Any price"}
           min={10}
           max={200}
           step={5}
           value={p.max_price ?? 200}
           onChange={(e) => setP({ ...p, max_price: Number(e.target.value) })}
-          className="mt-3 w-full accent-[var(--color-accent)]"
+          style={{ "--fill": `${(((p.max_price ?? 200) - 10) / 190) * 100}%` } as React.CSSProperties}
+          className="mt-4 w-full"
         />
         <button
           type="button"
           onClick={() => setP({ ...p, max_price: null })}
-          className="link-underline mt-2 text-xs text-muted-foreground"
+          className="link-underline mt-2 py-1 text-xs text-muted-foreground"
         >
           No budget
         </button>
-      </section>
+      </fieldset>
 
-      <section className="max-w-lg">
-        <p className="eyebrow">Ingredients</p>
-        <label className="mt-3 flex cursor-pointer items-center gap-3 text-sm">
+      <fieldset className="max-w-lg">
+        <legend className="eyebrow">Ingredients</legend>
+        <label className="mt-2 flex min-h-11 cursor-pointer select-none items-center gap-3 text-sm">
           <input
             type="checkbox"
             checked={p.fragrance_free}
             onChange={() => setP({ ...p, fragrance_free: !p.fragrance_free })}
-            className="h-3.5 w-3.5 accent-[var(--color-accent)]"
+            className="h-4 w-4 accent-[var(--color-accent)]"
           />
           Fragrance-free only
         </label>
         <input
           aria-label="Ingredients to avoid"
+          name="avoided_ingredients"
+          autoComplete="off"
+          spellCheck={false}
           value={avoid}
           onChange={(e) => setAvoid(e.target.value)}
-          placeholder="Always avoid, e.g. alcohol, coconut oil"
-          className="mt-3 w-full border border-border bg-transparent px-3 py-2 text-sm focus:border-foreground focus:outline-none"
+          placeholder="Always avoid, e.g. alcohol, coconut oil…"
+          className="field mt-3"
         />
         <p className="mt-2 text-xs text-muted-foreground">Separate several names with commas.</p>
-      </section>
+      </fieldset>
 
       <div className="flex flex-wrap items-center gap-5 border-t border-border pt-8">
         <button
           type="submit"
           disabled={update.isPending}
-          className="border border-foreground bg-foreground px-6 py-3 text-xs uppercase tracking-[0.14em] text-background transition-opacity hover:opacity-85 disabled:opacity-50"
+          aria-busy={update.isPending}
+          className="btn btn-primary"
         >
+          {update.isPending ? <span className="spinner" aria-hidden="true" /> : null}
           {update.isPending ? "Saving…" : "Save profile"}
         </button>
         {savedAt ? (
           <span role="status" className="text-sm text-muted-foreground">
-            Saved. <Link to="/account" className="link-underline text-foreground">See products for you →</Link>
+            Saved.{" "}
+            <Link to="/account" className="link-underline text-foreground">
+              See products for you <span aria-hidden="true" className="arrow">→</span>
+            </Link>
           </span>
         ) : null}
         {update.error ? (
-          <span role="alert" className="text-sm text-foreground">
+          <span role="alert" className="break-words text-sm text-foreground">
             {update.error.message}
           </span>
         ) : null}
@@ -500,7 +533,7 @@ function Notice({
   action: { label: string; tab?: Tab; to?: "/explore" };
 }) {
   return (
-    <div className="border border-dashed border-border-strong px-6 py-12 text-center">
+    <div className="empty-state px-6 py-14 text-center">
       <p className="display text-xl">{title}</p>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{text}</p>
       {action.to ? (

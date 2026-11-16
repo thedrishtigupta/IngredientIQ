@@ -12,15 +12,16 @@ export function SHAPChart({ rows }: { rows: ShapRow[] | null }) {
     );
   }
 
-  const max = Math.max(...rows.map((r) => r.meanAbsShap));
+  if (!rows.length) return <p className="text-sm text-muted-foreground">No features to show.</p>;
+  const max = Math.max(...rows.map((r) => r.meanAbsShap)) || 1;
   return (
     <ul className="space-y-2.5">
       {rows.map((r) => (
-        <li key={r.feature} className="grid grid-cols-[13rem_1fr_4rem] items-center gap-3">
-          <span className="truncate text-sm">{r.feature}</span>
-          <span className="h-3 w-full bg-muted">
+        <li key={r.feature} className="grid grid-cols-[minmax(0,9rem)_1fr_3.5rem] items-center gap-3 sm:grid-cols-[13rem_1fr_4rem]">
+          <span className="truncate text-sm" title={r.feature}>{r.feature}</span>
+          <span className="bar-track h-3">
             <span
-              className={`block h-full ${r.direction === "positive" ? "bg-foreground" : "bg-border-strong"}`}
+              className={`block h-full rounded-full ${r.direction === "positive" ? "bar-fill" : "bg-border-strong"}`}
               style={{ width: `${(r.meanAbsShap / max) * 100}%` }}
             />
           </span>

@@ -19,12 +19,15 @@ export function ProductImage({
   alt,
   className = "aspect-[4/5] w-full object-cover",
   eager = false,
+  priority = false,
   tag = true,
 }: {
   id: string;
   alt: string;
   className?: string;
   eager?: boolean;
+  /** The page's main, above-the-fold picture: fetched first. */
+  priority?: boolean;
   /** Show the small "Placeholder image" label (hide it on tiny thumbnails). */
   tag?: boolean;
 }) {
@@ -35,11 +38,13 @@ export function ProductImage({
         alt={alt}
         width={900}
         height={1100}
-        loading={eager ? "eager" : "lazy"}
+        loading={eager || priority ? "eager" : "lazy"}
+        decoding="async"
+        fetchPriority={priority ? "high" : "auto"}
         className={className}
       />
       {tag ? (
-        <span className="pointer-events-none absolute bottom-2 left-2 bg-background/85 px-1.5 py-0.5 text-[0.55rem] uppercase tracking-[0.12em] text-muted-foreground">
+        <span className="pointer-events-none absolute bottom-2.5 left-2.5 rounded-full bg-background/75 px-2 py-0.5 text-[0.6rem] uppercase tracking-[0.14em] text-muted-foreground backdrop-blur">
           Placeholder image
         </span>
       ) : null}

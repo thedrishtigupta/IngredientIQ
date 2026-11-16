@@ -2,7 +2,7 @@ export type MetricRow = { metric: string; modelA: number; modelB: number; higher
 
 export function PendingResult({ title, note }: { title: string; note: string }) {
   return (
-    <div className="border border-dashed border-border-strong px-6 py-12">
+    <div className="empty-state px-6 py-12">
       <p className="eyebrow">Awaiting results</p>
       <p className="display mt-2 text-2xl">{title}</p>
       <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">{note}</p>
@@ -34,13 +34,13 @@ export function ModelComparisonChart({ rows }: { rows: MetricRow[] | null }) {
             </div>
             {[
               { label: "A · metadata only", v: r.modelA, cls: "bg-border-strong" },
-              { label: "B · + ingredient features", v: r.modelB, cls: "bg-foreground" },
+              { label: "B · + ingredient features", v: r.modelB, cls: "bar-fill" },
             ].map((b) => (
-              <div key={b.label} className="mt-3 grid grid-cols-[11rem_1fr_3rem] items-center gap-3">
-                <span className="text-xs text-muted-foreground">{b.label}</span>
-                <span className="h-2 w-full bg-muted">
+              <div key={b.label} className="mt-3 grid grid-cols-[minmax(0,8rem)_1fr_3rem] items-center gap-3 sm:grid-cols-[11rem_1fr_3rem]">
+                <span className="break-words text-xs text-muted-foreground">{b.label}</span>
+                <span className="bar-track h-2">
                   <span
-                    className={`block h-full ${b.cls}`}
+                    className={`block h-full rounded-full ${b.cls}`}
                     style={{ width: `${(b.v / max) * 100}%` }}
                   />
                 </span>
@@ -68,15 +68,16 @@ export function AssociationChart({
     );
   }
 
-  const max = Math.max(...items.map((i) => Math.abs(i.effect)));
+  if (!items.length) return null;
+  const max = Math.max(...items.map((i) => Math.abs(i.effect))) || 1;
   return (
     <ul className="space-y-3">
       {items.map((i) => (
-        <li key={i.label} className="grid grid-cols-[12rem_1fr_5rem] items-center gap-3">
-          <span className="truncate text-sm">{i.label}</span>
-          <span className="h-2.5 w-full bg-muted">
+        <li key={i.label} className="grid grid-cols-[minmax(0,9rem)_1fr_4.5rem] items-center gap-3 sm:grid-cols-[12rem_1fr_5rem]">
+          <span className="truncate text-sm" title={i.label}>{i.label}</span>
+          <span className="bar-track h-2.5">
             <span
-              className={`block h-full ${i.effect >= 0 ? "bg-olive" : "bg-accent"}`}
+              className={`block h-full rounded-full ${i.effect >= 0 ? "bg-olive" : "bg-accent"}`}
               style={{ width: `${(Math.abs(i.effect) / max) * 100}%` }}
             />
           </span>

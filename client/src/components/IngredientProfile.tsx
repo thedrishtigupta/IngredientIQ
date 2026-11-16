@@ -7,7 +7,7 @@ import { groupLabel } from "@/lib/labels";
 export function IngredientProfile({ profile }: { profile: Record<string, number> | null }) {
   if (!profile) {
     return (
-      <div className="border border-dashed border-border-strong p-5">
+      <div className="empty-state p-6">
         <p className="eyebrow">Ingredient profile</p>
         <p className="mt-2 text-sm text-muted-foreground">
           No functional profile has been computed for this product.
@@ -44,7 +44,7 @@ export function IngredientProfile({ profile }: { profile: Record<string, number>
               {Array.from({ length: 10 }).map((_, i) => (
                 <span
                   key={i}
-                  className={`h-2.5 flex-1 ${i < Math.round(r.share * 10) ? "bg-foreground" : "bg-muted"}`}
+                  className={`h-2.5 flex-1 rounded-[2px] ${i < Math.round(r.share * 10) ? "bg-gradient-to-r from-accent to-gold" : "bg-muted"}`}
                 />
               ))}
             </span>

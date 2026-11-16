@@ -16,6 +16,7 @@ import {
 } from "@/lib/api";
 import { humanize } from "@/lib/labels";
 import { emptyForm, fromParams, fromProfile, PRESETS, toBody, type SearchForm } from "@/lib/search-form";
+import { ProductGridSkeleton } from "@/components/Skeleton";
 
 /**
  * URL state: `?q=` is the text search, `?preset=` opens with an example goal search,
@@ -25,6 +26,8 @@ type Search = {
   preset?: string | undefined;
   q?: string | undefined;
   run?: Record<string, unknown> | undefined;
+  /** Product id whose "Why this product?" panel is open (deep-linkable). */
+  open?: string | undefined;
 };
 
 const TEXT_RESULTS = 24;
@@ -37,6 +40,7 @@ export const Route = createFileRoute("/explore")({
       preset: typeof s["preset"] === "string" ? (s["preset"] as string) : undefined,
       q: q || undefined,
       run: run && typeof run === "object" && !Array.isArray(run) ? (run as Record<string, unknown>) : undefined,
+      open: typeof s["open"] === "string" && s["open"] ? s["open"] : undefined,
     };
   },
   head: () => ({
@@ -58,7 +62,7 @@ export const Route = createFileRoute("/explore")({
 });
 
 function Explore() {
-  const { preset, q = "", run: runParams } = Route.useSearch();
+  const { preset, q = "", run: runParams, open: openParam } = Route.useSearch();
   const navigate = Route.useNavigate();
   const auth = useAuth();
   const signedIn = !!auth.user;
@@ -76,7 +80,9 @@ function Explore() {
   const [submitted, setSubmitted] = useState<RecommendBody | null>(
     preset || runParams ? toBody(startForm) : null,
   );
-  const [openId, setOpenId] = useState<string | null>(null);
+  const openId = openParam ?? null;
+  const setOpenId = (id: string | null) =>
+    void navigate({ search: (prev) => ({ ...prev, open: id ?? undefined }), replace: true, resetScroll: false });
 
   const goals = useGoals();
   const categories = useCategories();
@@ -104,16 +110,16 @@ function Explore() {
   const error = rec.error ?? goals.error ?? categories.error;
 
   return (
-    <div className="mx-auto max-w-[1220px] px-5 py-12 sm:px-8">
-      <p className="eyebrow">Recommendation</p>
-      <h1 className="display mt-4 max-w-2xl text-4xl sm:text-5xl">
+    <div className="mx-auto max-w-[1280px] px-5 py-12 sm:px-8">
+      <p className="eyebrow-gold">Recommendation</p>
+      <h1 className="display mt-5 max-w-3xl text-5xl sm:text-6xl">
         Pick what you need. See what the evidence supports.
       </h1>
 
       <div className="mt-10 max-w-3xl">
         <SearchBar
           value={q}
-          placeholder="Search by product, brand or type, e.g. drunk elephant serum"
+          placeholder="Search by product, brand or type, e.g. drunk elephant serum…"
           onSubmit={setQuery}
           onClear={() => setQuery("")}
           autoFocus={!preset}
@@ -121,9 +127,9 @@ function Explore() {
       </div>
 
       {q ? (
-        <section aria-live="polite" className="mt-10">
+        <section aria-label="Search results" className="mt-10">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <p className="numeric text-xs text-muted-foreground">
+            <p role="status" className="numeric text-xs text-muted-foreground">
               {textResults.isFetching || auth.loading
                 ? "Searching…"
                 : textResults.data
@@ -135,7 +141,7 @@ function Explore() {
             <button
               type="button"
               onClick={() => setQuery("")}
-              className="link-underline text-xs uppercase tracking-[0.12em]"
+              className="link-underline py-1 text-xs uppercase tracking-[0.12em]"
             >
               Clear search
             </button>
@@ -146,7 +152,7 @@ function Explore() {
               <ErrorNotice error={textResults.error} />
             </div>
           ) : textResults.data && !textResults.data.length ? (
-            <div className="mt-6 border border-dashed border-border-strong px-6 py-12 text-center">
+            <div className="empty-state mt-6 px-6 py-12 text-center">
               <p className="display text-xl">No product matches “{q}”</p>
               <p className="mt-2 text-sm text-muted-foreground">
                 Check the spelling, use fewer words, or search by goal with the filters below.
@@ -171,7 +177,7 @@ function Explore() {
               setForm(f);
               run(f);
             }}
-            className="border border-foreground px-3 py-1.5 text-xs uppercase tracking-[0.12em] transition-colors hover:bg-foreground hover:text-background"
+            className="btn btn-primary btn-sm"
           >
             Use my profile
           </button>
@@ -185,15 +191,15 @@ function Explore() {
               setForm(p.form);
               run(p.form);
             }}
-            className="link-underline text-sm text-muted-foreground hover:text-foreground"
+            className="chip"
           >
             {p.label}
           </button>
         ))}
       </div>
 
-      <div className="mt-10 gap-12 border-t border-border pt-10 lg:grid lg:grid-cols-[300px_1fr]">
-        <aside className="mb-12 lg:mb-0">
+      <div className="mt-10 gap-12 border-t border-border pt-10 lg:grid lg:grid-cols-[320px_1fr]">
+        <aside className="card-lux mb-12 self-start p-6 lg:sticky lg:top-24 lg:mb-0">
           <FilterPanel
             form={form}
             onChange={setForm}
@@ -206,13 +212,15 @@ function Explore() {
 
         <div>
           {(rec.isFetching || (submitted && auth.loading)) && !data ? (
-            <div className="border border-dashed border-border-strong px-6 py-16 text-center">
-              <p className="display text-xl">Ranking products…</p>
-            </div>
+            <ProductGridSkeleton
+              count={6}
+              label="Ranking products…"
+              className="grid grid-cols-1 gap-x-5 gap-y-14 sm:grid-cols-2 sm:gap-x-8 xl:grid-cols-3"
+            />
           ) : error ? (
             <ErrorNotice error={error} />
           ) : !data ? (
-            <div className="border border-dashed border-border-strong px-6 py-16 text-center">
+            <div className="empty-state px-6 py-20 text-center">
               <p className="display text-xl">Nothing searched yet</p>
               <p className="mt-2 text-sm text-muted-foreground">
                 Choose a goal and any filters, then press “Find products”, or try one of the examples
@@ -222,7 +230,7 @@ function Explore() {
           ) : (
             <>
               <div className="mb-8">
-                <p className="numeric text-xs text-muted-foreground">
+                <p role="status" className="numeric text-xs text-muted-foreground">
                   {data.count} products meet the filters · ranked by hybrid score
                   {rec.isFetching ? " · updating…" : ""}
                 </p>
@@ -233,23 +241,23 @@ function Explore() {
 
               <div className="grid grid-cols-1 gap-x-5 gap-y-14 sm:grid-cols-2 sm:gap-x-8 xl:grid-cols-3">
                 {data.results.map((r, i) => (
-                  <div key={r.product_id}>
+                  <div key={r.product_id} className="min-w-0">
                     <ProductCard
                       product={r}
                       index={i}
                       rank={i + 1}
                       tags={r.matched_goals.map(humanize)}
                     />
-                    <div className="mt-4 border-t border-border pt-3">
+                    <div className="mt-4 rounded-2xl border border-border bg-paper/70 p-4">
                       <div className="mb-3 flex items-baseline justify-between">
                         <span className="eyebrow">Score</span>
-                        <span className="numeric text-lg">{r.score.toFixed(2)}</span>
+                        <span className="display text-gilded text-3xl">{r.score.toFixed(2)}</span>
                       </div>
                       <ScoreBreakdown result={r} hasGoals={hasGoals} compact />
                       <button
                         type="button"
                         onClick={() => setOpenId(r.product_id)}
-                        className="link-underline mt-4 text-xs uppercase tracking-[0.12em]"
+                        className="btn btn-outline btn-sm mt-4 w-full"
                       >
                         Why this product?
                       </button>
@@ -259,7 +267,7 @@ function Explore() {
               </div>
 
               {!data.results.length ? (
-                <div className="border border-dashed border-border-strong px-6 py-16 text-center">
+                <div className="empty-state px-6 py-20 text-center">
                   <p className="display text-xl">Nothing satisfies these constraints</p>
                   <p className="mt-2 text-sm text-muted-foreground">
                     Relax the budget or remove an ingredient requirement rather than accepting a weaker

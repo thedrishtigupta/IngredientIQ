@@ -56,5 +56,12 @@ export function useCompare() {
     emit();
   }, []);
 
-  return { ids, toggle, clear, max: MAX, has: (id: string) => ids.includes(id) };
+  /** Put back a previous selection (used by "Undo" after Clear all). */
+  const restore = useCallback((next: string[]) => {
+    memory = next.slice(-MAX);
+    persist();
+    emit();
+  }, []);
+
+  return { ids, toggle, clear, restore, max: MAX, has: (id: string) => ids.includes(id) };
 }

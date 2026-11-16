@@ -15,7 +15,8 @@ import {
   type ProductIngredient,
 } from "@/lib/api";
 import { useCompare } from "@/lib/compare-store";
-import { fmtInt, fmtPrice, fmtRating, groupLabel, pct } from "@/lib/labels";
+import { fmtDate, fmtInt, fmtPrice, fmtRating, groupLabel, pct } from "@/lib/labels";
+import { ProductDetailSkeleton, ProductGridSkeleton } from "@/components/Skeleton";
 
 export const Route = createFileRoute("/product/$productId")({
   head: () => ({
@@ -48,25 +49,25 @@ function ProductPage() {
   }, [product]);
 
   if (isLoading) {
-    return <p className="mx-auto max-w-[1220px] px-5 py-24 text-sm text-muted-foreground sm:px-8">Loading product…</p>;
+    return <ProductDetailSkeleton />;
   }
   if (error instanceof ApiError && error.status === 404) {
     return (
-      <div className="mx-auto max-w-[1220px] px-5 py-24 text-center sm:px-8">
+      <div className="mx-auto max-w-[1280px] px-5 py-24 text-center sm:px-8">
         <p className="eyebrow">404</p>
         <h1 className="display mt-3 text-4xl">Product not found</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           There is no product with id <span className="numeric">{productId}</span> in the dataset.
         </p>
         <Link to="/explore" className="link-underline mt-6 inline-block text-sm">
-          Back to Explore →
+          Back to Explore <span aria-hidden="true" className="arrow">→</span>
         </Link>
       </div>
     );
   }
   if (error || !product) {
     return (
-      <div className="mx-auto max-w-[1220px] px-5 py-12 sm:px-8">
+      <div className="mx-auto max-w-[1280px] px-5 py-12 sm:px-8">
         <ErrorNotice error={error} />
       </div>
     );
@@ -90,21 +91,25 @@ function ProductView({ product }: { product: Product }) {
   const flags = FLAGS.filter(([key]) => product[key] === true);
 
   return (
-    <article className="mx-auto max-w-[1220px] px-5 py-10 sm:px-8">
-      <nav className="text-xs text-muted-foreground">
-        <Link to="/explore" className="link-underline">
+    <article className="mx-auto max-w-[1280px] px-5 py-10 sm:px-8">
+      <nav aria-label="Breadcrumb" className="text-xs text-muted-foreground">
+        <Link to="/explore" className="link-underline py-1">
           Explore
         </Link>
-        <span className="mx-2">/</span>
-        <span>{[product.category, product.subcategory].filter(Boolean).join(" · ")}</span>
+        <span aria-hidden="true" className="mx-2">
+          /
+        </span>
+        <span aria-current="page">{[product.category, product.subcategory].filter(Boolean).join(" · ")}</span>
       </nav>
 
       <div className="mt-8 grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-20">
-        <ProductImage id={product.product_id} alt={name} eager className="aspect-[4/5] w-full object-cover" />
+        <div className="overflow-hidden rounded-[1.75rem] shadow-[var(--shadow-lift)] lg:sticky lg:top-24 lg:self-start">
+          <ProductImage id={product.product_id} alt={name} priority className="aspect-[4/5] w-full object-cover" />
+        </div>
 
         <div className="lg:pt-6">
-          <p className="text-[0.72rem] uppercase tracking-[0.16em] text-muted-foreground">{product.brand}</p>
-          <h1 className="display mt-3 text-4xl sm:text-5xl">{product.product_name}</h1>
+          <p className="eyebrow-gold">{product.brand}</p>
+          <h1 className="display mt-5 break-words text-5xl sm:text-6xl">{product.product_name}</h1>
           {product.variation_value ? (
             <p className="mt-4 text-sm text-muted-foreground">
               {product.variation_type ? `${product.variation_type}: ` : ""}
@@ -112,7 +117,7 @@ function ProductView({ product }: { product: Product }) {
             </p>
           ) : null}
 
-          <dl className="mt-8 grid grid-cols-2 gap-y-5 border-y border-border py-6 sm:grid-cols-4">
+          <dl className="card-lux mt-8 grid grid-cols-2 gap-y-5 px-6 py-6 sm:grid-cols-4">
             {[
               ["Price", fmtPrice(product.price) + (product.sale_price_usd ? ` · sale ${fmtPrice(product.sale_price_usd)}` : "")],
               ["Rating", `${fmtRating(product.rating)} / 5`],
@@ -142,13 +147,14 @@ function ProductView({ product }: { product: Product }) {
             <button
               type="button"
               onClick={() => toggle(product.product_id)}
-              className="border border-foreground px-5 py-2.5 text-xs uppercase tracking-[0.14em] transition-colors hover:bg-foreground hover:text-background"
+              aria-pressed={has(product.product_id)}
+              className="btn btn-primary"
             >
               {has(product.product_id) ? "Remove from compare" : "Add to compare"}
             </button>
             <Link
               to="/compare"
-              className="border border-border px-5 py-2.5 text-xs uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+              className="btn btn-outline"
             >
               Open comparison
             </Link>
@@ -156,16 +162,18 @@ function ProductView({ product }: { product: Product }) {
         </div>
       </div>
 
-      <div className="mt-20 grid gap-16 lg:grid-cols-[1fr_1fr] lg:gap-20">
+      <div className="mt-24 grid gap-16 lg:grid-cols-[1fr_1fr] lg:gap-20">
         <section>
-          <IngredientProfile profile={product.functional_profile} />
+          <div className="card-lux p-6 sm:p-8">
+            <IngredientProfile profile={product.functional_profile} />
+          </div>
 
           <div className="mt-10">
             <p className="eyebrow">Full ingredient list · {main.length} in label order</p>
             <IngredientRows ingredients={main} />
             {variants.map(([section, list]) => (
               <details key={section} className="mt-6">
-                <summary className="cursor-pointer text-sm text-muted-foreground">
+                <summary className="cursor-pointer py-2 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground">
                   Separate list for “{section}” ({list.length})
                 </summary>
                 <IngredientRows ingredients={list} />
@@ -211,7 +219,7 @@ function ProductView({ product }: { product: Product }) {
                   ["Reviews", fmtInt(summary.review_count)],
                   ["Average review rating", summary.average_review_rating?.toFixed(2) ?? "—"],
                   ["Would recommend", summary.recommendation_rate === null ? "—" : pct(summary.recommendation_rate)],
-                  ["Review period", `${summary.earliest_review_date ?? "?"} to ${summary.latest_review_date ?? "?"}`],
+                  ["Review period", `${fmtDate(summary.earliest_review_date)} to ${fmtDate(summary.latest_review_date)}`],
                 ].map(([k, v]) => (
                   <div key={k}>
                     <dt className="eyebrow">{k}</dt>
@@ -224,13 +232,14 @@ function ProductView({ product }: { product: Product }) {
         </section>
       </div>
 
-      <section className="mt-24">
-        <h2 className="display text-3xl">Similar products</h2>
+      <section className="mt-28 border-t border-border pt-16">
+        <p className="eyebrow-gold">You may also like</p>
+        <h2 className="display mt-5 text-4xl sm:text-5xl">Similar products</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Products with the most similar mix of ingredient functions (cosine similarity), from any category.
         </p>
         {similar.isLoading ? (
-          <p className="mt-10 text-sm text-muted-foreground">Loading…</p>
+          <ProductGridSkeleton count={4} label="Loading similar products…" className="mt-10 grid grid-cols-2 gap-x-5 gap-y-12 sm:gap-x-8 lg:grid-cols-4" />
         ) : similar.error ? (
           <div className="mt-10">
             <ErrorNotice error={similar.error} />
@@ -255,11 +264,11 @@ function IngredientRows({ ingredients }: { ingredients: ProductIngredient[] }) {
   return (
     <ul className="mt-4 divide-y divide-border border-y border-border">
       {ingredients.map((ing) => (
-        <li key={`${ing.section}-${ing.position}`} className="flex items-start justify-between gap-6 py-3">
-          <div className="flex gap-3">
+        <li key={`${ing.section}-${ing.position}`} className="flex items-start justify-between gap-6 py-3 [contain-intrinsic-size:auto_48px] [content-visibility:auto]">
+          <div className="flex min-w-0 gap-3">
             <span className="numeric w-6 shrink-0 text-right text-xs text-muted-foreground">{ing.position}</span>
-            <div>
-              <Link to="/ingredients" search={{ i: ing.ingredient_id }} className="link-underline text-sm">
+            <div className="min-w-0">
+              <Link to="/ingredients" search={{ i: ing.ingredient_id }} className="link-underline break-words text-sm">
                 {ing.name}
               </Link>
               {ing.presence_type === "MAY_CONTAIN" ? (
@@ -267,7 +276,7 @@ function IngredientRows({ ingredients }: { ingredients: ProductIngredient[] }) {
               ) : null}
             </div>
           </div>
-          <span className="shrink-0 text-right text-[0.68rem] uppercase tracking-[0.1em] text-muted-foreground">
+          <span className="max-w-[45%] shrink-0 text-right text-[0.68rem] uppercase tracking-[0.1em] text-muted-foreground">
             {ing.functional_groups.length ? ing.functional_groups.map(groupLabel).join(" · ") : "Unmapped"}
           </span>
         </li>

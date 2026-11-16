@@ -5,7 +5,7 @@ import { fmtInt, humanize, pct } from "@/lib/labels";
 export function ReviewInsights({ aspects }: { aspects: Aspects | null | undefined }) {
   if (!aspects) {
     return (
-      <div className="border border-dashed border-border-strong p-5">
+      <div className="empty-state p-6">
         <p className="text-sm">No review signals for this product</p>
         <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
           Review signals are only computed for the reviewed subset of the dataset. This product falls
@@ -25,11 +25,11 @@ export function ReviewInsights({ aspects }: { aspects: Aspects | null | undefine
       {rows.map(([aspect, a]) => (
         <li key={aspect} className="grid grid-cols-[1fr_auto] items-center gap-4 py-3">
           <div>
-            <p className="text-sm">{humanize(aspect)}</p>
-            <div className="mt-2 h-[3px] w-full max-w-56 bg-muted">
-              <div
-                className="h-full bg-olive transition-[width] duration-700"
-                style={{ width: pct(a.positive_share) }}
+            <p className="break-words text-sm">{humanize(aspect)}</p>
+            <div className="bar-track mt-2 max-w-56" aria-hidden="true">
+              <span
+                className="bar-scale bg-olive"
+                style={{ "--v": Math.max(0, Math.min(1, a.positive_share)) } as React.CSSProperties}
               />
             </div>
           </div>

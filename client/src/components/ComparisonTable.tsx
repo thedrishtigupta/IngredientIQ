@@ -62,26 +62,27 @@ export function ComparisonTable({
       <table className="w-full min-w-[640px] border-collapse text-sm">
         <thead>
           <tr>
-            <th className="w-40 border-b border-border py-4 text-left align-bottom">
+            <th scope="col" className="w-40 border-b border-border py-4 text-left align-bottom">
               <span className="eyebrow">Attribute</span>
             </th>
             {products.map((p) => (
-              <th key={p.product_id} className="border-b border-border py-4 pl-6 text-left align-bottom">
-                <div className="mb-3 w-24">
+              <th key={p.product_id} scope="col" className="min-w-0 border-b border-border py-4 pl-6 text-left align-bottom">
+                <div className="mb-3 w-24 overflow-hidden rounded-xl">
                   <ProductImage id={p.product_id} alt={p.product_name} tag={false} />
                 </div>
                 <p className="text-[0.68rem] uppercase tracking-[0.12em] text-muted-foreground">{p.brand}</p>
                 <Link
                   to="/product/$productId"
                   params={{ productId: p.product_id }}
-                  className="link-underline font-normal"
+                  className="link-underline break-words font-normal"
                 >
                   {p.product_name}
                 </Link>
                 <button
                   type="button"
                   onClick={() => onRemove(p.product_id)}
-                  className="mt-2 block text-xs font-normal text-muted-foreground hover:text-foreground"
+                  aria-label={`Remove ${p.product_name} from comparison`}
+                  className="-ml-1 mt-1 block rounded-md px-1 py-1.5 text-xs font-normal text-muted-foreground transition-colors duration-150 hover:text-foreground"
                 >
                   Remove
                 </button>
@@ -95,7 +96,7 @@ export function ComparisonTable({
             const best = values ? Math.max(...values) : null;
             return (
               <tr key={row.label}>
-                <th className="border-b border-border py-4 pr-4 text-left align-top font-normal text-muted-foreground">
+                <th scope="row" className="border-b border-border py-4 pr-4 text-left align-top font-normal text-muted-foreground">
                   {row.label}
                 </th>
                 {products.map((p, i) => {
@@ -107,7 +108,18 @@ export function ComparisonTable({
                         isBest ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
-                      <span className={isBest ? "border-b border-accent pb-0.5" : ""}>{row.render(p)}</span>
+                      <span
+                        className={
+                          isBest
+                            ? "numeric text-foreground underline decoration-accent decoration-2 underline-offset-[6px]"
+                            : row.numeric
+                              ? "numeric"
+                              : ""
+                        }
+                      >
+                        {row.render(p)}
+                      </span>
+                      {isBest ? <span className="sr-only"> (strongest)</span> : null}
                     </td>
                   );
                 })}

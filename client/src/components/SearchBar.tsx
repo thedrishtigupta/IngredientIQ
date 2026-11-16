@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 type Props = {
   value?: string;
@@ -8,6 +8,7 @@ type Props = {
   /** When set, a "Clear" button appears while there is text; it empties the box and calls this. */
   onClear?: () => void;
   size?: "lg" | "md";
+  /** Focus on mount, on a desktop pointer only (never pops the keyboard on a phone). */
   autoFocus?: boolean;
 };
 
@@ -22,6 +23,12 @@ export function SearchBar({
 }: Props) {
   const [text, setText] = useState(value);
   const id = useId(); // unique per instance, so two search bars on one page don't share a label
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (autoFocus && window.matchMedia("(pointer: fine)").matches) inputRef.current?.focus({ preventScroll: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Follow the parent when it changes the value (e.g. the URL's ?q= or a "clear" elsewhere).
   useEffect(() => setText(value), [value]);
@@ -33,8 +40,8 @@ export function SearchBar({
         e.preventDefault();
         onSubmit(text.trim());
       }}
-      className={`group flex items-end gap-3 border-b border-border-strong transition-colors focus-within:border-foreground ${
-        size === "lg" ? "pb-3" : "pb-2"
+      className={`group flex items-center gap-3 rounded-full border border-border bg-paper/90 shadow-[var(--shadow-soft)] transition-[border-color,box-shadow] duration-300 focus-within:border-accent focus-within:shadow-[0_0_0_5px_color-mix(in_oklab,var(--color-gold)_20%,transparent),var(--shadow-lift)] ${
+        size === "lg" ? "py-2 pl-6 pr-2" : "py-1.5 pl-4 pr-1.5"
       }`}
     >
       <label className="sr-only" htmlFor={id}>
@@ -53,9 +60,11 @@ export function SearchBar({
       </svg>
       <input
         id={id}
+        ref={inputRef}
         type="search"
-        autoFocus={autoFocus}
+        name="q"
         autoComplete="off"
+        spellCheck={false}
         enterKeyHint="search"
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -67,7 +76,7 @@ export function SearchBar({
         }}
         placeholder={placeholder}
         className={`w-full min-w-0 bg-transparent text-foreground placeholder:text-muted-foreground/70 focus:outline-none [&::-webkit-search-cancel-button]:hidden ${
-          size === "lg" ? "text-lg sm:text-2xl" : "text-base"
+          size === "lg" ? "py-2 text-base sm:text-lg" : "py-1 text-sm"
         }`}
       />
       {onClear && text ? (
@@ -76,8 +85,10 @@ export function SearchBar({
           onClick={() => {
             setText("");
             onClear();
+            inputRef.current?.focus();
           }}
-          className={`shrink-0 whitespace-nowrap pb-1 uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground ${
+          aria-label="Clear search"
+          className={`shrink-0 whitespace-nowrap rounded-full px-2 py-2 uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground ${
             size === "lg" ? "text-xs sm:text-sm" : "text-[0.65rem]"
           }`}
         >
@@ -86,9 +97,7 @@ export function SearchBar({
       ) : null}
       <button
         type="submit"
-        className={`shrink-0 whitespace-nowrap border-b border-foreground pb-1 uppercase tracking-[0.14em] text-foreground transition-opacity hover:opacity-60 ${
-          size === "lg" ? "text-xs sm:text-sm" : "text-[0.65rem]"
-        }`}
+        className={`btn btn-primary shrink-0 ${size === "lg" ? "" : "btn-sm"}`}
       >
         {buttonLabel}
       </button>

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AssociationChart, ModelComparisonChart } from "@/components/ResearchChart";
 import { SHAPChart } from "@/components/SHAPChart";
@@ -11,7 +11,15 @@ import {
 } from "@/lib/research";
 import { fmtInt } from "@/lib/labels";
 
+type Search = { scope?: string | undefined; outcome?: TargetKey | undefined };
+const OUTCOMES: TargetKey[] = ["rating", "log_loves", "log_reviews", "rec_rate", "high_performer"];
+
 export const Route = createFileRoute("/research")({
+  // The chosen scope and outcome live in the URL so a view can be linked and survives a reload.
+  validateSearch: (s: Record<string, unknown>): Search => ({
+    scope: typeof s["scope"] === "string" && scopeNames.includes(s["scope"]) ? s["scope"] : undefined,
+    outcome: OUTCOMES.includes(s["outcome"] as TargetKey) ? (s["outcome"] as TargetKey) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Research — Do ingredients predict product success? | IngredientIQ" },
@@ -76,11 +84,7 @@ function Chip({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`border px-3 py-1.5 text-sm transition-colors ${
-        active
-          ? "border-foreground bg-foreground text-background"
-          : "border-border text-muted-foreground hover:border-border-strong hover:text-foreground"
-      }`}
+      className="chip"
     >
       {children}
     </button>
@@ -88,16 +92,22 @@ function Chip({
 }
 
 function Research() {
-  const [scope, setScope] = useState(scopeNames[0] ?? "All");
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const scope = search.scope ?? scopeNames[0] ?? "All";
+  const targetKey: TargetKey = search.outcome ?? "rating";
+  const setScope = (s: string) =>
+    void navigate({ search: (prev) => ({ ...prev, scope: s === scopeNames[0] ? undefined : s }), replace: true, resetScroll: false });
+  const setTargetKey = (k: TargetKey) =>
+    void navigate({ search: (prev) => ({ ...prev, outcome: k === "rating" ? undefined : k }), replace: true, resetScroll: false });
   const targets = targetsFor(scope);
-  const [targetKey, setTargetKey] = useState<TargetKey>("rating");
   const current = targets.find(([k]) => k === targetKey) ?? targets[0];
   const d = research.dataset;
 
   return (
-    <div className="mx-auto max-w-[1220px] px-5 py-12 sm:px-8">
-      <p className="eyebrow">Research track</p>
-      <h1 className="display mt-4 max-w-3xl text-4xl sm:text-6xl">
+    <div className="mx-auto max-w-[1280px] px-5 py-12 sm:px-8">
+      <p className="eyebrow-gold">Research track</p>
+      <h1 className="display mt-5 max-w-4xl text-5xl sm:text-6xl">
         Do ingredient features add predictive value beyond brand, category, price and existing
         popularity?
       </h1>
@@ -115,12 +125,12 @@ function Research() {
       </p>
 
       {/* Method */}
-      <section className="mt-16 border-y border-border py-12">
-        <div className="grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mt-16">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {method.map((m, i) => (
-            <div key={m.t} className="rule-top pt-4">
-              <span className="numeric text-xs text-accent">{String(i + 1).padStart(2, "0")}</span>
-              <h2 className="mt-3 text-base">{m.t}</h2>
+            <div key={m.t} className="card-lux p-7">
+              <span className="display text-gilded text-5xl">{String(i + 1).padStart(2, "0")}</span>
+              <h2 className="display mt-5 text-2xl">{m.t}</h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{m.d}</p>
             </div>
           ))}
@@ -129,16 +139,16 @@ function Research() {
 
       {/* Selectors */}
       <section className="mt-16 space-y-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="eyebrow mr-3 w-16">Scope</span>
+        <div role="group" aria-labelledby="scope-label" className="flex flex-wrap items-center gap-2">
+          <span id="scope-label" className="eyebrow mr-3 w-16">Scope</span>
           {scopeNames.map((s) => (
             <Chip key={s} active={s === scope} onClick={() => setScope(s)}>
               {s === "All" ? "All categories" : s}
             </Chip>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="eyebrow mr-3 w-16">Outcome</span>
+        <div role="group" aria-labelledby="outcome-label" className="flex flex-wrap items-center gap-2">
+          <span id="outcome-label" className="eyebrow mr-3 w-16">Outcome</span>
           {targets.map(([k, t]) => (
             <Chip key={k} active={k === current?.[0]} onClick={() => setTargetKey(k)}>
               {t.label}
@@ -151,7 +161,7 @@ function Research() {
 
       {/* Pre-specified hypotheses */}
       <section className="mt-20">
-        <h2 className="display text-3xl">Hypotheses named before the analysis</h2>
+        <h2 className="display text-4xl">Hypotheses named before the analysis</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           The synopsis proposed glycerin with hyaluronic acid as an example combination. Effect is
           the brand-, subcategory- and price-adjusted difference in standard deviations (in
@@ -164,11 +174,11 @@ function Research() {
           <table className="w-full min-w-[560px] text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                <th className="py-2 font-normal">Combination</th>
-                <th className="py-2 font-normal">Scope</th>
-                <th className="py-2 font-normal">Outcome</th>
-                <th className="py-2 text-right font-normal">Adjusted effect</th>
-                <th className="py-2 text-right font-normal">q (adjusted)</th>
+                <th scope="col" className="py-2 font-normal">Combination</th>
+                <th scope="col" className="py-2 font-normal">Scope</th>
+                <th scope="col" className="py-2 font-normal">Outcome</th>
+                <th scope="col" className="py-2 text-right font-normal">Adjusted effect</th>
+                <th scope="col" className="py-2 text-right font-normal">q (adjusted)</th>
               </tr>
             </thead>
             <tbody>
@@ -222,7 +232,7 @@ function TargetView({ result }: { result: TargetResult }) {
       {/* Model comparison */}
       <section className="mt-16">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 className="display text-3xl">Model A vs Model B</h2>
+          <h2 className="display text-4xl">Model A vs Model B</h2>
           <p className="text-sm text-muted-foreground">
             {fmtInt(result.n)} products · LightGBM, random CV, mean over folds
           </p>
@@ -235,14 +245,14 @@ function TargetView({ result }: { result: TargetResult }) {
           <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                <th className="py-2 font-normal">Model</th>
-                <th className="py-2 font-normal">Split</th>
-                <th className="py-2 text-right font-normal">A</th>
-                <th className="py-2 text-right font-normal">B</th>
-                <th className="py-2 text-right font-normal">Gain</th>
-                <th className="py-2 text-right font-normal">B wins</th>
-                <th className="py-2 text-right font-normal">p (corrected)</th>
-                <th className="py-2 pl-4 font-normal">Verdict</th>
+                <th scope="col" className="py-2 font-normal">Model</th>
+                <th scope="col" className="py-2 font-normal">Split</th>
+                <th scope="col" className="py-2 text-right font-normal">A</th>
+                <th scope="col" className="py-2 text-right font-normal">B</th>
+                <th scope="col" className="py-2 text-right font-normal">Gain</th>
+                <th scope="col" className="py-2 text-right font-normal">B wins</th>
+                <th scope="col" className="py-2 text-right font-normal">p (corrected)</th>
+                <th scope="col" className="py-2 pl-4 font-normal">Verdict</th>
               </tr>
             </thead>
             <tbody>
@@ -276,7 +286,7 @@ function TargetView({ result }: { result: TargetResult }) {
 
       {/* Associations */}
       <section className="mt-20">
-        <h2 className="display text-3xl">Ingredients associated with this outcome</h2>
+        <h2 className="display text-4xl">Ingredients associated with this outcome</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           {fmtInt(result.tests.total)} ingredients and combinations tested.{" "}
           {fmtInt(result.tests.significantRaw)} look significant on their own; only{" "}
@@ -298,7 +308,7 @@ function TargetView({ result }: { result: TargetResult }) {
 
       {/* SHAP */}
       <section className="mt-20">
-        <h2 className="display text-3xl">SHAP feature importance</h2>
+        <h2 className="display text-4xl">SHAP feature importance</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Mean absolute SHAP value per feature in the ingredient-aware LightGBM model: how much each
           input moves its predictions. Share of the total by feature family:
@@ -310,9 +320,9 @@ function TargetView({ result }: { result: TargetResult }) {
               className="grid grid-cols-[minmax(0,16rem)_1fr_3.5rem] items-center gap-3"
             >
               <span className="truncate text-sm">{GROUP_LABELS[group] ?? group}</span>
-              <span className="h-2 w-full bg-muted">
+              <span className="bar-track h-2">
                 <span
-                  className={`block h-full ${group === "baseline" ? "bg-border-strong" : "bg-foreground"}`}
+                  className={`block h-full rounded-full ${group === "baseline" ? "bg-border-strong" : "bar-fill"}`}
                   style={{ width: `${(share ?? 0) * 100}%` }}
                 />
               </span>

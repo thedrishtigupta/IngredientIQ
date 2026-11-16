@@ -35,7 +35,44 @@ export const GROUP_BLURBS: Record<string, string> = {
   barrier_lipid: "Skin-identical lipid used in barrier-repair claims.",
 };
 
-export const fmtInt = (n: number) => n.toLocaleString("en-US");
-export const fmtPrice = (p: number | null) => (p === null ? "—" : `$${p.toFixed(2)}`);
-export const fmtRating = (r: number | null) => (r === null ? "—" : r.toFixed(1));
-export const pct = (x: number) => `${Math.round(x * 100)}%`;
+// Pinned to en-US (the dataset is US Sephora, in USD) so server and client render the same string.
+const LOCALE = "en-US";
+const intFmt = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 });
+const priceFmt = new Intl.NumberFormat(LOCALE, { style: "currency", currency: "USD", minimumFractionDigits: 2 });
+const wholePriceFmt = new Intl.NumberFormat(LOCALE, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const ratingFmt = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const pctFmt = new Intl.NumberFormat(LOCALE, { style: "percent", maximumFractionDigits: 0 });
+const dateFmt = new Intl.DateTimeFormat(LOCALE, { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
+const relFmt = new Intl.RelativeTimeFormat(LOCALE, { numeric: "auto" });
+
+export const fmtInt = (n: number) => intFmt.format(n);
+export const fmtPrice = (p: number | null) => (p === null ? "—" : priceFmt.format(p));
+/** A budget cap such as "$45" (whole dollars, as the slider sets them). */
+export const fmtBudget = (p: number) => wholePriceFmt.format(p);
+export const fmtRating = (r: number | null) => (r === null ? "—" : ratingFmt.format(r));
+export const pct = (x: number) => pctFmt.format(x);
+
+/** An ISO date ("2023-03-14") as "Mar 14, 2023"; anything unparseable comes back unchanged. */
+export const fmtDate = (iso: string | null | undefined) => {
+  if (!iso) return "?";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? iso : dateFmt.format(d);
+};
+
+/** "3 hours ago", "yesterday", ... from an ISO timestamp. */
+export const fmtRelative = (iso: string, now = Date.now()) => {
+  let value = (new Date(iso).getTime() - now) / 1000;
+  const steps: [Intl.RelativeTimeFormatUnit, number][] = [
+    ["second", 60],
+    ["minute", 60],
+    ["hour", 24],
+    ["day", 7],
+    ["week", 4.345],
+    ["month", 12],
+  ];
+  for (const [unit, size] of steps) {
+    if (Math.abs(value) < size) return relFmt.format(Math.round(value), unit);
+    value /= size;
+  }
+  return relFmt.format(Math.round(value), "year");
+};

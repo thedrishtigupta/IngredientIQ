@@ -26,7 +26,9 @@ export const Route = createFileRoute("/compare")({
 });
 
 function Compare() {
-  const { ids, toggle, clear, max } = useCompare();
+  const { ids, toggle, clear, restore, max } = useCompare();
+  // "Clear all" is undoable: keep what was there until the next change.
+  const [cleared, setCleared] = useState<string[] | null>(null);
   const fetched = useProductsById(ids); // one query per id, same order as ids
   const products = fetched.flatMap((q) => (q.data ? [q.data as ProductDetail] : []));
   const failed = ids.flatMap((id, i) => (fetched[i]?.error ? [{ id, error: fetched[i]!.error }] : []));
@@ -36,16 +38,40 @@ function Compare() {
   const found = useProducts(search, 8, search !== "");
 
   return (
-    <div className="mx-auto max-w-[1220px] px-5 py-12 sm:px-8">
+    <div className="mx-auto max-w-[1280px] px-5 py-12 sm:px-8">
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <div>
-          <p className="eyebrow">Comparison</p>
-          <h1 className="display mt-4 text-4xl sm:text-5xl">Side by side</h1>
+          <p className="eyebrow-gold">Comparison</p>
+          <h1 className="display mt-5 text-5xl sm:text-6xl">Side by side</h1>
         </div>
         {ids.length ? (
-          <button type="button" onClick={clear} className="link-underline text-sm text-muted-foreground">
+          <button
+            type="button"
+            onClick={() => {
+              setCleared(ids);
+              clear();
+            }}
+            className="link-underline py-1 text-sm text-muted-foreground"
+          >
             Clear all
           </button>
+        ) : null}
+      </div>
+      <div role="status" aria-live="polite">
+        {cleared && !ids.length ? (
+          <p className="mt-4 inline-flex flex-wrap items-center gap-x-3 rounded-full border border-border bg-paper px-4 py-2 text-sm text-muted-foreground">
+            Comparison cleared.
+            <button
+              type="button"
+              onClick={() => {
+                restore(cleared);
+                setCleared(null);
+              }}
+              className="link-underline py-1 text-foreground"
+            >
+              Undo
+            </button>
+          </p>
         ) : null}
       </div>
       <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
@@ -66,13 +92,13 @@ function Compare() {
       ))}
 
       {products.length ? (
-        <div className="mt-12">
+        <div className="card-lux mt-12 p-5 sm:p-8">
           <ComparisonTable products={products} onRemove={toggle} />
         </div>
       ) : loading ? (
         <p className="mt-12 text-sm text-muted-foreground">Loading products…</p>
       ) : !failed.length ? (
-        <div className="mt-12 border border-dashed border-border-strong px-6 py-16 text-center">
+        <div className="empty-state mt-12 px-6 py-20 text-center">
           <p className="display text-2xl">Nothing selected yet</p>
           <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
             Search for a product below, or hover any product card in Explore and choose Compare.
@@ -86,12 +112,14 @@ function Compare() {
           <div className="mt-4">
             <SearchBar
               size="md"
-              placeholder="Search by product name or brand"
+              placeholder="Search by product name or brand…"
               buttonLabel="Search"
               onSubmit={setSearch}
             />
           </div>
-          {found.isLoading ? <p className="mt-4 text-sm text-muted-foreground">Searching…</p> : null}
+          <div role="status" aria-live="polite">
+            {found.isLoading ? <p className="mt-4 text-sm text-muted-foreground">Searching…</p> : null}
+          </div>
           {found.error ? (
             <div className="mt-4">
               <ErrorNotice error={found.error} />
@@ -99,6 +127,9 @@ function Compare() {
           ) : null}
           {found.data ? (
             found.data.length ? (
+              found.data.every((p) => ids.includes(p.product_id)) ? (
+                <p className="mt-4 text-sm text-muted-foreground">Every match is already in the comparison.</p>
+              ) : (
               <div className="mt-4 flex flex-wrap gap-2">
                 {found.data
                   .filter((p) => !ids.includes(p.product_id))
@@ -106,13 +137,20 @@ function Compare() {
                     <button
                       key={p.product_id}
                       type="button"
-                      onClick={() => toggle(p.product_id)}
-                      className="border border-border px-3 py-2 text-xs text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+                      onClick={() => {
+                        setCleared(null);
+                        toggle(p.product_id);
+                      }}
+                      className="chip max-w-full text-left"
                     >
-                      {p.brand} · {p.product_name}
+                      <span aria-hidden="true" className="mr-1.5 text-accent">+</span>
+                      <span className="min-w-0 truncate">
+                        {p.brand} · {p.product_name}
+                      </span>
                     </button>
                   ))}
               </div>
+              )
             ) : (
               <p className="mt-4 text-sm text-muted-foreground">No product matches “{search}”.</p>
             )
