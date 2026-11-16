@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Production deployment modernization tasks for IngredientIQ.",
+  "tasks": [
+    {
+      "type": "setupBaseline",
+      "id": "001-setup-baseline",
+      "description": "Freeze current production-relevant behavior before deployment changes",
+      "reason": "Deployment and security changes must be compared with the current API and frontend behavior.",
+      "requirements": "Snapshot the source folder and record test cases for health, CORS, authentication, recommendation, frontend API calls, and error responses. Do not read or include tagged .env contents.",
+      "snapshotFolder": "src",
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "transform",
+      "id": "002-deployment-contract",
+      "description": "Create a reproducible Render Free backend and Vercel-compatible frontend deployment contract",
+      "reason": "The assessment found no platform manifests, pinned start command, runtime policy, or deployment health configuration.",
+      "requirements": "Add and document the exact production deployment files and commands, including a Render service definition or equivalent `render.yaml`, Python runtime pin, uvicorn start command for `src.api.main:app`, health-check path, build command, and a frontend deployment configuration using `client/` as the root with its existing Vite/TanStack build. Evaluate Vercel backend compatibility in a bounded spike only; if synchronous psycopg, vector-index construction, or adapter requirements are not safe without broad risky changes, keep FastAPI on Render Free and deploy only the frontend to Vercel. Candidate files: `render.yaml`, `runtime.txt` or equivalent runtime pin, `client/vercel.json` only if required, `README.md`, and deployment documentation. Preserve application behavior and do not add containerization.",
+      "dependencies": [],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "transform",
+      "id": "003-config-cors-frontend",
+      "description": "Validate production configuration and connect the deployed frontend to the API safely",
+      "reason": "The assessment found local-only CORS, localhost API defaults, and no fail-closed production configuration contract.",
+      "requirements": "Update `src/api/main.py`, `src/recommender/repository.py`, and add a focused configuration module or equivalent tests so required production database settings and allowed origins are validated from environment variables without reading, logging, or exposing tagged `.env` contents. Make CORS an explicit allowlist with safe development defaults, preserve preflight behavior, and ensure `client/src/lib/api.ts`, `client/.env.example`, and deployment documentation use a production `VITE_API_URL` with no trailing-slash ambiguity. Never print secret values.",
+      "dependencies": [
+        "002-deployment-contract"
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "true",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "transform",
+      "id": "004-neon-database-lifecycle",
+      "description": "Make Neon PostgreSQL connections and schema lifecycle safe for production instances",
+      "reason": "The assessment found per-request connections, lazy DDL, process-local readiness state, and no explicit Neon SSL, pooling, timeout, or migration path.",
+      "requirements": "Update `src/recommender/repository.py`, `src/api/db.py`, and `sql/` migration/bootstrap documentation to support Neon-compatible SSL, bounded connect and statement timeouts, safe connection reuse or pooling appropriate to Render and any tested serverless target, and explicit versioned migrations. Remove request-time/process-local DDL as the production migration mechanism while preserving local developer bootstrap behavior. Add a controlled migration/rollback command or documented procedure that uses secret configuration without embedding credentials. Keep production data separate from committed dumps.",
+      "dependencies": [
+        "003-config-cors-frontend"
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "true",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "security",
+      "id": "005-auth-api-security-hardening",
+      "description": "Harden authentication and API edges while preserving supported sign-in behavior",
+      "reason": "The assessment identified long-lived localStorage bearer tokens and missing abuse, CSRF, headers, request-limit, redaction, and observability controls.",
+      "requirements": "Update `src/api/auth.py`, `src/api/main.py`, `src/api/users.py`, `client/src/lib/session.ts`, and related tests. Preserve sign-in, sign-out, optional-user, and current-user behavior while reducing token exposure (prefer secure, appropriately scoped cookies with an explicit CSRF model, or document and test a narrowly justified compatible mitigation), enforcing bounded session lifetime and revocation, adding password abuse/rate controls, security headers, request limits, trusted proxy/TLS handling, structured redacted logs, and generic production errors. Do not log authorization headers, passwords, database URLs, `.env` contents, or LLM secrets. Add tests for unauthorized access, expiry/revocation, origin/CSRF behavior, rate limits, and error redaction.",
+      "dependencies": [
+        "004-neon-database-lifecycle"
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "true",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "transform",
+      "id": "006-health-readiness-performance",
+      "description": "Add deployment health semantics and bounded startup/index behavior",
+      "reason": "The assessment found only a database-dependent health endpoint and startup/first-request vector-index cold-start risk.",
+      "requirements": "Update `src/api/main.py`, `src/recommender/repository.py`, and `src/recommender/vectors.py` as needed to separate cheap liveness from dependency readiness, define bounded database/LLM probe semantics, return platform-usable status codes, and prevent duplicate concurrent vector-index construction. Preserve recommendation results and the existing `/health` response contract where possible; add a documented readiness endpoint or compatibility mapping. Define Render health-check configuration and measure cold-start/index/query behavior within Free-tier limits before accepting production readiness.",
+      "dependencies": [
+        "005-auth-api-security-hardening"
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "true",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "integrationTest",
+      "id": "007-integration-validation",
+      "description": "Build focused deployment, Neon, frontend, and behavior-preservation tests",
+      "reason": "The requested modernization requires evidence that deployment configuration changes do not alter application behavior.",
+      "requirements": "Add or extend tests under `tests/` and `client/` without reading tagged .env contents. Cover FastAPI startup, liveness/readiness, CORS allow/deny and preflight, environment validation/redaction, Neon connection timeout/SSL configuration with a test or ephemeral database strategy, migration idempotency/rollback, auth/session expiry and revocation, security headers/rate limits, vector-index concurrency, frontend production API URL, `npm run lint`, `npm run build`, and Render/Vercel smoke probes. Run the existing backend suite and representative recommendation/user flows against the frozen baseline.",
+      "dependencies": [
+        "001-setup-baseline",
+        "002-deployment-contract",
+        "003-config-cors-frontend",
+        "004-neon-database-lifecycle",
+        "005-auth-api-security-hardening",
+        "006-health-readiness-performance"
+      ]
+    },
+    {
+      "type": "transform",
+      "id": "008-production-deployment-runbook",
+      "description": "Publish the guarded production release and rollback runbook",
+      "reason": "A repeatable release process is required for Render Free, Vercel, and Neon operations.",
+      "requirements": "Update `README.md` and add deployment documentation describing secret names (not values), Render Free service setup, optional Vercel frontend setup, the Vercel backend compatibility gate, Neon migration/bootstrap order, health/readiness probes, log redaction, backup/restore expectations, session-secret rotation, rollback, and the exact verification commands from the plan. Do not include credentials, connection strings, tagged `.env` contents, or production data.",
+      "dependencies": [
+        "007-integration-validation"
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      }
+    }
+  ],
+  "metadata": {
+    "planName": "production-deployment-render-neon",
+    "projectName": "IngredientIQ",
+    "language": "python",
+    "createdAt": "2026-11-16T13:41:09+05:30",
+    "version": "1.0"
+  }
+}

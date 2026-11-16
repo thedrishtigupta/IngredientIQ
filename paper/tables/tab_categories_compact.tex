@@ -1,0 +1,41 @@
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{|l|l|r|r|r|r|r|r|}
+\hline
+\rowcolor{headfill} \multicolumn{2}{|c|}{} & \multicolumn{3}{c|}{\textbf{Random}} & \multicolumn{3}{c|}{\textbf{Unseen brand}} \\
+\hline
+\rowcolor{headfill} \textbf{Scope} & \textbf{Target} & \textbf{$\Delta$} & \textbf{$p_{corr}$} & \textbf{$q$} & \textbf{$\Delta$} & \textbf{$p_{corr}$} & \textbf{$q$} \\
+\hline
+Makeup & Rating & $+0.009$ & 0.653 & 0.825 & $+0.062$ & 0.057 & 0.313 \\
+\hline
+Makeup & Loves (log) & $-0.002$ & 0.914 & 0.954 & $+0.019$ & 0.466 & 0.822 \\
+\hline
+Makeup & Reviews (log) & $-0.012$ & 0.614 & 0.822 & $+0.015$ & 0.295 & 0.770 \\
+\hline
+Makeup & High performer & $-0.008$ & 0.523 & 0.822 & $+0.018$ & 0.701 & 0.842 \\
+\hline
+\hline
+Hair & Rating & $+0.058$ & 0.077 & 0.313 & $+0.070$ & 0.490 & 0.822 \\
+\hline
+Hair & Loves (log) & $+0.001$ & 0.957 & 0.957 & $+0.039$ & 0.549 & 0.822 \\
+\hline
+Hair & Reviews (log) & $+0.012$ & 0.617 & 0.822 & $+0.016$ & 0.831 & 0.949 \\
+\hline
+Hair & High performer & $-0.029$ & 0.078 & 0.313 & $-0.033$ & 0.545 & 0.822 \\
+\hline
+\hline
+Fragrance & Rating & $+0.104$ & 0.047 & 0.313 & $+0.068$ & 0.566 & 0.822 \\
+\hline
+Fragrance & Loves (log) & $+0.005$ & 0.887 & 0.954 & $+0.120$ & 0.046 & 0.313 \\
+\hline
+Fragrance & Reviews (log) & $+0.030$ & 0.239 & 0.718 & $+0.059$ & 0.321 & 0.770 \\
+\hline
+Fragrance & High performer & $+0.033$ & 0.029 & 0.313 & $+0.042$ & 0.220 & 0.718 \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize $q$: Benjamini--Hochberg over all rows and both splits of this table.}
+\caption{Model B minus Model A within further categories (LightGBM).}
+\label{tab:categories}
+\end{table}

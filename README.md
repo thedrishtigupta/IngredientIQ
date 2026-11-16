@@ -393,6 +393,14 @@ ingredientiq.dump
 
 ---
 
+# Production deployment
+
+The guarded production target is Render Free for the FastAPI API and Neon
+PostgreSQL, with an optional Vercel frontend. See
+[`docs/DEPLOYMENT_RENDER_NEON.md`](docs/DEPLOYMENT_RENDER_NEON.md) for secret
+names, migrations, probes, release, and rollback instructions. Production
+secrets belong in Render/Vercel/Neon settings, never in the repository.
+
 # Quick Start (Docker — recommended)
 
 The whole local database runs in one Docker container. You do **not** need to

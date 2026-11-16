@@ -9,12 +9,14 @@ import hashlib
 import hmac
 import secrets
 from datetime import datetime, timedelta, timezone
+import time
 
 from fastapi import Depends, Header, HTTPException
 
 from src.api.db import get_repo, query_one
 
 SESSION_DAYS = 30
+_login_attempts: dict[str, list[float]] = {}
 _N, _R, _P = 2**14, 8, 1  # scrypt cost: ~16 MB memory, a few tens of ms per hash
 
 
@@ -99,3 +101,15 @@ def current_user(authorization: str | None = Header(None), repo=Depends(get_repo
 
 def bearer_token(authorization: str | None = Header(None)) -> str | None:
     return _bearer(authorization)
+
+
+def login_allowed(identifier: str, now: float | None = None) -> bool:
+    """Small per-process guard suitable for Render Free; use edge/WAF limits too."""
+    now = now or time.time()
+    attempts = [t for t in _login_attempts.get(identifier, []) if now - t < 300]
+    if len(attempts) >= 10:
+        _login_attempts[identifier] = attempts
+        return False
+    attempts.append(now)
+    _login_attempts[identifier] = attempts
+    return True

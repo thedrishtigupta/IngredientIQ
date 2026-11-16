@@ -1,41 +1,67 @@
-\begin{table*}[t]
+\begin{table}[htbp]
 \centering
-\caption{Sensitivity of the Model A vs B comparison (LightGBM, 5-fold).}
-\label{tab:sensitivity}
-\footnotesize
-\begin{tabular}{lrllrrr}
-\toprule
-Setting & Products & Scope & Target & $\Delta$ (B--A) & $p_{corr}$ & $q$ \\
-\midrule
+\small
+\begin{tabular}{|l|r|l|l|r|r|r|}
+\hline
+\rowcolor{headfill} \textbf{Setting} & \textbf{Products} & \textbf{Scope} & \textbf{Target} & \textbf{$\Delta$ (B--A)} & \textbf{$p_{corr}$} & \textbf{$q$} \\
+\hline
 reviews >= 10 & 5,547 & All & Rating & $-0.001$ & 0.921 & 0.921 \\
+\hline
 reviews >= 10 & 5,547 & All & Loves (log) & $-0.004$ & 0.726 & 0.921 \\
+\hline
 reviews >= 10 & 5,547 & All & Reviews (log) & $-0.004$ & 0.243 & 0.673 \\
+\hline
 reviews >= 10 & 5,547 & All & High performer & $-0.012$ & 0.091 & 0.573 \\
+\hline
 reviews >= 10 & 5,547 & Skincare & Rating & $+0.025$ & 0.127 & 0.573 \\
+\hline
 reviews >= 10 & 5,547 & Skincare & Loves (log) & $-0.003$ & 0.904 & 0.921 \\
+\hline
 reviews >= 10 & 5,547 & Skincare & Reviews (log) & $+0.010$ & 0.745 & 0.921 \\
+\hline
 reviews >= 10 & 5,547 & Skincare & Recommend rate & $+0.038$ & 0.299 & 0.673 \\
+\hline
 reviews >= 10 & 5,547 & Skincare & High performer & $-0.007$ & 0.744 & 0.921 \\
+\hline
 reviews >= 50 & 5,547 & All & Rating & $+0.007$ & 0.571 & 0.838 \\
+\hline
 reviews >= 50 & 5,547 & All & Loves (log) & $-0.004$ & 0.726 & 0.838 \\
+\hline
 reviews >= 50 & 5,547 & All & Reviews (log) & $-0.004$ & 0.243 & 0.700 \\
+\hline
 reviews >= 50 & 5,547 & All & High performer & $-0.012$ & 0.091 & 0.409 \\
+\hline
 reviews >= 50 & 5,547 & Skincare & Rating & $+0.095$ & 0.075 & 0.409 \\
+\hline
 reviews >= 50 & 5,547 & Skincare & Loves (log) & $-0.003$ & 0.904 & 0.904 \\
+\hline
 reviews >= 50 & 5,547 & Skincare & Reviews (log) & $+0.010$ & 0.745 & 0.838 \\
+\hline
 reviews >= 50 & 5,547 & Skincare & Recommend rate & $+0.047$ & 0.311 & 0.700 \\
+\hline
 reviews >= 50 & 5,547 & Skincare & High performer & $-0.007$ & 0.744 & 0.838 \\
+\hline
 no deduplication & 6,320 & All & Rating & $+0.024$ & 0.082 & 0.561 \\
+\hline
 no deduplication & 6,320 & All & Loves (log) & $-0.010$ & 0.230 & 0.561 \\
+\hline
 no deduplication & 6,320 & All & Reviews (log) & $-0.006$ & 0.593 & 0.725 \\
+\hline
 no deduplication & 6,320 & All & High performer & $+0.003$ & 0.673 & 0.725 \\
+\hline
 no deduplication & 6,320 & Skincare & Rating & $+0.057$ & 0.312 & 0.561 \\
+\hline
 no deduplication & 6,320 & Skincare & Loves (log) & $-0.033$ & 0.281 & 0.561 \\
+\hline
 no deduplication & 6,320 & Skincare & Reviews (log) & $+0.012$ & 0.466 & 0.698 \\
+\hline
 no deduplication & 6,320 & Skincare & Recommend rate & $+0.040$ & 0.232 & 0.561 \\
+\hline
 no deduplication & 6,320 & Skincare & High performer & $+0.006$ & 0.725 & 0.725 \\
-\bottomrule
+\hline
 \end{tabular}
 \par\smallskip
-\parbox{\linewidth}{\scriptsize $q$: Benjamini--Hochberg within each setting.}
-\end{table*}
+\parbox{0.95\linewidth}{\footnotesize $q$: Benjamini--Hochberg within each setting.}
+\caption{Sensitivity of the Model A vs B comparison (LightGBM, 5-fold).}
+\label{tab:sensitivity}
+\end{table}

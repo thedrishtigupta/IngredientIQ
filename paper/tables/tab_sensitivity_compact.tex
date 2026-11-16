@@ -1,0 +1,34 @@
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{|l|l|r|r|r|r|r|r|}
+\hline
+\rowcolor{headfill} \multicolumn{2}{|c|}{} & \multicolumn{2}{c|}{\textbf{reviews $\geq$ 10 (5,547)}} & \multicolumn{2}{c|}{\textbf{reviews $\geq$ 50 (5,547)}} & \multicolumn{2}{c|}{\textbf{no deduplication (6,320)}} \\
+\hline
+\rowcolor{headfill} \textbf{Scope} & \textbf{Target} & \textbf{$\Delta$} & \textbf{$q$} & \textbf{$\Delta$} & \textbf{$q$} & \textbf{$\Delta$} & \textbf{$q$} \\
+\hline
+All & Rating & $-0.001$ & 0.921 & $+0.007$ & 0.838 & $+0.024$ & 0.561 \\
+\hline
+All & Loves (log) & $-0.004$ & 0.921 & $-0.004$ & 0.838 & $-0.010$ & 0.561 \\
+\hline
+All & Reviews (log) & $-0.004$ & 0.673 & $-0.004$ & 0.700 & $-0.006$ & 0.725 \\
+\hline
+All & High performer & $-0.012$ & 0.573 & $-0.012$ & 0.409 & $+0.003$ & 0.725 \\
+\hline
+\hline
+Skincare & Rating & $+0.025$ & 0.573 & $+0.095$ & 0.409 & $+0.057$ & 0.561 \\
+\hline
+Skincare & Loves (log) & $-0.003$ & 0.921 & $-0.003$ & 0.904 & $-0.033$ & 0.561 \\
+\hline
+Skincare & Reviews (log) & $+0.010$ & 0.921 & $+0.010$ & 0.838 & $+0.012$ & 0.698 \\
+\hline
+Skincare & Recommend rate & $+0.038$ & 0.673 & $+0.047$ & 0.700 & $+0.040$ & 0.561 \\
+\hline
+Skincare & High performer & $-0.007$ & 0.921 & $-0.007$ & 0.838 & $+0.006$ & 0.725 \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize $\Delta$: Model B minus Model A. $q$: Benjamini--Hochberg within each setting. Product counts in parentheses.}
+\caption{Sensitivity of the Model A vs B comparison (LightGBM, 5-fold).}
+\label{tab:sensitivity}
+\end{table}
