@@ -11,9 +11,8 @@ import {
 } from "@tanstack/react-query";
 import { getToken, setToken, useSession } from "./session";
 
-export const API_URL: string = (
-  (import.meta.env["VITE_API_URL"] as string | undefined) || "http://localhost:8000"
-).replace(/\/$/, "");
+const configuredApiUrl = (import.meta.env["VITE_API_URL"] as string | undefined)?.trim();
+export const API_URL: string = (configuredApiUrl || "http://localhost:8000").replace(/\/+$/, "");
 
 /** `status` is null when the API could not be reached at all (not running, wrong URL, CORS). */
 export class ApiError extends Error {

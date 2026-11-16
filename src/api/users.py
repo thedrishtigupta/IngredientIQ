@@ -9,6 +9,7 @@ from src.api.auth import (
     current_user,
     delete_session,
     hash_password,
+    login_allowed,
     verify_password,
 )
 from src.api.db import get_repo, query, query_one
@@ -109,6 +110,8 @@ def register(body: RegisterBody, repo=Depends(get_repo)):
 @router.post("/auth/login", response_model=AuthResponse, tags=["account"])
 def login(body: LoginBody, repo=Depends(get_repo)):
     """Sign in with email and password."""
+    if not login_allowed(body.email.strip().lower()):
+        raise HTTPException(status_code=429, detail="Too many sign-in attempts. Try again later.")
     row = query_one(
         repo,
         "SELECT user_id, email, display_name, created_at, password_hash FROM users WHERE lower(email) = %s",

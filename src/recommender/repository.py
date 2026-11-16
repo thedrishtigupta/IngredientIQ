@@ -1,19 +1,12 @@
 import os
 
 import psycopg
-from dotenv import load_dotenv
-
-load_dotenv()
+from src.api.config import database_settings
 
 class ProductRepository:
     def __init__(self):
-        self.connection = psycopg.connect(
-            host=os.getenv("PGHOST", "localhost"),
-            port=os.getenv("PGPORT", "5432"),
-            dbname=os.getenv("PGDATABASE", "ingredientiq"),
-            user=os.getenv("PGUSER", "postgres"),
-            password=os.getenv("PGPASSWORD"),
-        )
+        settings = database_settings()
+        self.connection = psycopg.connect(settings.conninfo, **settings.kwargs) if settings.conninfo else psycopg.connect(**settings.kwargs)
 
     def close(self):
         self.connection.close()

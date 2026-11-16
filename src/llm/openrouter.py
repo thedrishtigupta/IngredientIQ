@@ -17,11 +17,8 @@ import logging
 import os
 
 import httpx
-from dotenv import load_dotenv
 
 from src.recommender.config import MIN_ASPECT_MENTIONS, UNRELIABLE_ASPECTS
-
-load_dotenv()  # read OPENROUTER_API_KEY / OPENROUTER_MODEL from .env (once, at import)
 
 URL = "https://openrouter.ai/api/v1/chat/completions"
 DEFAULT_MODEL = "google/gemini-2.5-flash-lite"  # small and cheap; override with OPENROUTER_MODEL

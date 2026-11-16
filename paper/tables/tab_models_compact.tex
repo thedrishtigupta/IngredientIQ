@@ -1,0 +1,34 @@
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{|l|l|l|r|r|r|r|r|r|r|r|}
+\hline
+\rowcolor{headfill} \multicolumn{3}{|c|}{} & \multicolumn{4}{c|}{\textbf{Random 5-fold $\times$3}} & \multicolumn{4}{c|}{\textbf{Unseen brand}} \\
+\hline
+\rowcolor{headfill} \textbf{Scope} & \textbf{Target} & \textbf{Metric} & \textbf{A} & \textbf{B} & \textbf{$\Delta$} & \textbf{$p_{corr}$} & \textbf{A} & \textbf{B} & \textbf{$\Delta$} & \textbf{$p_{corr}$} \\
+\hline
+All & Rating & $R^2$ & 0.242 & 0.250 & $+0.008$ & 0.540 & 0.115 & 0.141 & $+0.026$ & 0.085 \\
+\hline
+All & Loves (log) & $R^2$ & 0.525 & 0.520 & $-0.004$ & 0.509 & 0.346 & 0.345 & $-0.001$ & 0.901 \\
+\hline
+All & Reviews (log) & $R^2$ & 0.438 & 0.432 & $-0.006$ & 0.339 & 0.276 & 0.280 & $+0.003$ & 0.505 \\
+\hline
+All & High performer & AUC & 0.801 & 0.790 & $-0.011$ & 0.125 & 0.745 & 0.736 & $-0.009$ & 0.582 \\
+\hline
+\hline
+Skincare & Rating & $R^2$ & 0.176 & 0.204 & $+0.028$ & 0.243 & 0.025 & 0.065 & $+0.040$ & 0.451 \\
+\hline
+Skincare & Loves (log) & $R^2$ & 0.441 & 0.441 & $+0.001$ & 0.950 & 0.169 & 0.185 & $+0.016$ & 0.362 \\
+\hline
+Skincare & Reviews (log) & $R^2$ & 0.334 & 0.343 & $+0.008$ & 0.655 & 0.150 & 0.137 & $-0.013$ & 0.655 \\
+\hline
+Skincare & Recommend rate & $R^2$ & 0.199 & 0.233 & $+0.034$ & 0.348 & 0.124 & 0.151 & $+0.027$ & 0.176 \\
+\hline
+Skincare & High performer & AUC & 0.773 & 0.776 & $+0.003$ & 0.804 & 0.705 & 0.709 & $+0.004$ & 0.794 \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize $p_{corr}$: Nadeau--Bengio corrected resampled $t$-test over folds (15 random, 5 unseen brand). Differences significant at 0.05: 0 of 18.}
+\caption{Model A (metadata) vs Model B (+ingredient features), LightGBM.}
+\label{tab:models}
+\end{table}

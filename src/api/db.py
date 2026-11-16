@@ -4,6 +4,7 @@ from pathlib import Path
 from psycopg.rows import dict_row
 
 from src.recommender.repository import ProductRepository
+from src.api.config import is_production
 
 SQL_DIR = Path(__file__).resolve().parents[2] / "sql"
 
@@ -16,7 +17,8 @@ def get_repo():
     FastAPI reuses it within a request, so every dependency that asks for it shares one connection."""
     repo = ProductRepository()
     try:
-        ensure_user_tables(repo.connection)  # normally done at startup; covers "database was down then"
+        if not is_production():
+            ensure_user_tables(repo.connection)  # local developer bootstrap only
         yield repo
     finally:
         repo.close()

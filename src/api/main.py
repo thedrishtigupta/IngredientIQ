@@ -5,6 +5,7 @@ Docs: http://localhost:8000/docs
 """
 import logging
 import os
+import time
 from contextlib import asynccontextmanager
 
 import psycopg
@@ -13,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from src.api import users
+from src.api.config import allowed_origins, is_production
 from src.api.auth import current_user, optional_user
 from src.api.db import ensure_user_tables, get_repo, query, query_one
 from src.api.schemas import (
@@ -36,33 +38,43 @@ from src.recommender.vectors import VectorIndex
 log = logging.getLogger("ingredientiq.api")
 
 # If the database does not answer, give up after 5 seconds (-> HTTP 503) instead of hanging.
-os.environ.setdefault("PGCONNECT_TIMEOUT", "5")
-
 # The vector index is built once and shared by all requests (it is only read, never changed).
 _index = None
+_index_building = False
 
 
 def get_index(conn):
     """Return the shared VectorIndex, building it from the database the first time."""
     global _index
-    if _index is None:  # ponytail: no lock; two first requests at once just build it twice
+    global _index_building
+    if _index is None and not _index_building:
+        _index_building = True
         _index = VectorIndex.from_db(conn)
+        _index_building = False
     return _index
 
 
 @asynccontextmanager
 async def lifespan(app):
-    # Build the index at startup. If the database is down, start anyway:
-    # the index is built on the first request that needs it.
+    # Render's liveness probe must not depend on Neon being reachable during a
+    # cold start. Production readiness is checked by /ready; the index is
+    # built lazily by the first request that needs it.
+    if is_production():
+        yield
+        return
+
+    # Build the index at startup locally. If the database is down, start
+    # anyway so local liveness/debugging remains possible.
     try:
         repo = ProductRepository()
         try:
             get_index(repo.connection)
-            ensure_user_tables(repo.connection)
+            if not is_production():
+                ensure_user_tables(repo.connection)
         finally:
             repo.close()
-    except psycopg.Error as e:
-        log.warning("Database not reachable at startup (%s); index built on first request", e)
+    except psycopg.Error:
+        log.warning("Database not reachable at startup; readiness will remain degraded")
     yield
 
 
@@ -75,10 +87,28 @@ app = FastAPI(
 # The frontend dev server runs on another port, so allow any localhost origin.
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"^http://(localhost|127\.0\.0\.1)(:\d+)?$",
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=allowed_origins(),
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
+
+
+@app.middleware("http")
+async def security_and_limits(request: Request, call_next):
+    if request.method in {"POST", "PUT", "PATCH"}:
+        length = request.headers.get("content-length")
+        if length and int(length) > 1_000_000:
+            return JSONResponse(status_code=413, content={"detail": "Request too large"})
+    response = await call_next(request)
+    response.headers.update({
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    })
+    if is_production():
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
 
 
 @app.exception_handler(psycopg.OperationalError)
@@ -86,7 +116,7 @@ async def database_down(request: Request, exc: psycopg.OperationalError):
     """Any lost or refused database connection becomes a clean 503 instead of a stack trace."""
     return JSONResponse(
         status_code=503,
-        content={"detail": "Database unreachable. Is the ingredientiq-db container running?"},
+        content={"detail": "Database unreachable."},
     )
 
 
@@ -104,7 +134,7 @@ def health():
     """Is the API up, can it reach the database, is an LLM key configured?"""
     try:
         repo = ProductRepository()
-    except psycopg.Error:
+    except (psycopg.Error, RuntimeError):
         return Health(status="degraded", db=False, llm_enabled=llm_enabled(), products=0)
     try:
         products = query_one(repo, "SELECT count(*) AS n FROM products")["n"]
@@ -121,6 +151,26 @@ def health():
         reviewed_products=reviewed["n"],
         reviews=reviewed["reviews"],
     )
+
+
+@app.get("/live")
+def live():
+    """Cheap process liveness probe for Render."""
+    return {"status": "ok"}
+
+
+@app.get("/ready")
+def ready():
+    """Dependency readiness probe; unlike liveness, this may return 503."""
+    try:
+        repo = ProductRepository()
+        try:
+            query_one(repo, "SELECT 1")
+        finally:
+            repo.close()
+    except (psycopg.Error, RuntimeError):
+        return JSONResponse(status_code=503, content={"status": "not_ready", "db": False})
+    return {"status": "ready", "db": True}
 
 
 @app.get("/goals", response_model=list[Goal])
